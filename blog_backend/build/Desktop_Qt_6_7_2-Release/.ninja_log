@@ -1,0 +1,6 @@
+# ninja log v6
+3	1661	1729883607958662399	CMakeFiles/test_project.dir/controllers/SimpleController.cpp.o	84dbf8f3394a9f1c
+2	2052	1729850517092452268	CMakeFiles/test_project.dir/main.cpp.o	afcc44c25676f46a
+1	2565	1729850160497320667	test/CMakeFiles/test_project_test.dir/test_main.cc.o	9776e22224d31083
+1661	2179	1729883609616698302	test_project	6625b6c15c2cf226
+2565	3113	1729850163060382417	test/test_project_test	a4c1e81ed2aaaec0

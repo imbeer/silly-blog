@@ -1,0 +1,83 @@
+{
+    "rdbms": "postgresql",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dbname": "blog",
+    "schema": "public",
+    "user": "postgres",
+    "password": "1440",
+    "tables": [],
+
+    "relationships": {
+        "enabled": false,
+        "items": [
+            {
+                "type": "has many",
+                "original_table_name": "user",
+                "original_table_alias": "user",
+                "original_key": "user_id",
+                "target_table_name": "post",
+                "target_table_alias": "post",
+                "target_key": "user_id",
+                "enable_reverse": true
+            },
+            {
+                "type": "has many",
+                "original_table_name": "user",
+                "original_table_alias": "user",
+                "original_key": "user_id",
+                "target_table_name": "comment",
+                "target_table_alias": "comment",
+                "target_key": "user_id",
+                "enable_reverse": true
+            },
+            {
+                "type": "has many",
+                "original_table_name": "post",
+                "original_table_alias": "post",
+                "original_key": "post_id",
+                "target_table_name": "comment",
+                "target_table_alias": "comment",
+                "target_key": "post_id",
+                "enable_reverse": true
+            },
+            {
+                "type": "has many",
+                "original_table_name": "post",
+                "original_table_alias": "post",
+                "original_key": "post_id",
+                "target_table_name": "image",
+                "target_table_alias": "image",
+                "target_key": "post_id",
+                "enable_reverse": true
+            },
+            {
+                "type": "many to many",
+                "original_table_name": "user",
+                "original_table_alias": "user",
+                "original_key": "user_id",
+                "pivot_table": {
+                    "table_name": "like",
+                    "original_key": "user_id",
+                    "target_key": "post_id"
+                },
+                "target_table_name": "post",
+                "target_table_alias": "post",
+                "target_key": "post_id",
+                "enable_reverse": true
+            }
+        ]
+    },
+    "restful_api_controllers": {
+        "enabled": false,
+        "resource_uri": "/*",
+        "class_name": "Restful*Ctrl",
+        "filters": [],
+        "db_client": {
+            "name": "default",
+            "is_fast": false
+        },
+        "directory": "controllers",
+        "generate_base_only": false
+    }
+}
