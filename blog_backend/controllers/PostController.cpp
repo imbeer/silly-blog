@@ -25,7 +25,7 @@ void PostController::newPost(
             (*callbackPtr)(response);
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << e.base().what();
+            // LOG_ERROR << e.base().what();
             auto response = HttpResponse::newHttpResponse();
             response->setStatusCode(HttpStatusCode::k400BadRequest);
             (*callbackPtr)(response);
@@ -47,13 +47,13 @@ void PostController::getAllPosts(
         const Criteria userCriteria(drogon_model::blog::User::Cols::_username, CompareOperator::EQ, authorUsername);
         const auto users = m_userMapper.findBy(userCriteria);
         if (users.empty()) {
-            LOG_ERROR << "No user found with username: " << authorUsername;
+            // LOG_ERROR << "No user found with username: " << authorUsername;
             auto response = HttpResponse::newHttpResponse();
             response->setStatusCode(HttpStatusCode::k400BadRequest);
             (*callbackPtr)(response);
             return;
         }
-        const auto userId = users[0].getUserId();
+        const auto userId = users[0].getValueOfUserId();
         postCriteria = Criteria(drogon_model::blog::Post::Cols::_user_id, CompareOperator::EQ, userId);
     }
 
@@ -67,7 +67,7 @@ void PostController::getAllPosts(
         responseBody.append(post.toJson());
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
-    response->setStatusCode(HttpStatusCode::k201Created);
+    response->setStatusCode(HttpStatusCode::k200OK);
     (*callbackPtr)(response);
 }
 

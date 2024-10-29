@@ -10,7 +10,7 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(PostController::newPost, "/posts", drogon::Post, "LoginFilter");
+        ADD_METHOD_TO(PostController::newPost, "/posts", drogon::Post/*, "LoginFilter"*/);
         ADD_METHOD_TO(PostController::getAllPosts, "/posts?author={}&offset={}&limit={}", Get);
         // TODO: Login Filter
     METHOD_LIST_END
