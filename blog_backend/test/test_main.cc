@@ -4,7 +4,37 @@
 
 DROGON_TEST(BasicTest)
 {
-    // Add your tests here
+    using namespace drogon;
+    using namespace std;
+
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+    const std::string author = "mcgeechristopher";
+    const int offset = 0;
+    const int limit = 20;
+    const auto request = HttpRequest::newHttpRequest();
+    request->setPath("/posts");
+    request->setParameter("author", author);
+    request->setParameter("offset", std::to_string(offset));
+    request->setParameter("limit", std::to_string(limit));
+
+    client->sendRequest(
+        request,
+        [TEST_CTX, author, offset, limit](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                // Print the URL with parameters and the response data
+                cout << "Request URL: /posts?author=" << author
+                     << "&offset=" << offset << "&limit=" << limit << endl;
+                cout << "Status Code: " << response->getStatusCode() << endl;
+                cout << "Response Body: " << response->getBody() << endl;
+
+                // Verify the status code is 200 OK
+                CHECK(response->getStatusCode() == k200OK);
+            } else {
+                // If there's an error, print the error and fail the test
+                cerr << "Request failed with error: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
 }
 
 int main(int argc, char** argv) 
