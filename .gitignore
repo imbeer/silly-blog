@@ -1,0 +1,11 @@
+.idea
+out
+.mvn
+target
+venv
+__pycache__
+build
+build-*
+*.pro.user
+cmake-build-debug
+CMakeLists.txt.user
