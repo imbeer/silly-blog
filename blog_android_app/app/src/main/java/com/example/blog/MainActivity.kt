@@ -1,8 +1,10 @@
 package com.example.blog
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.view.MotionEvent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+//        val intent = Intent(this, PostActivity::class.java)
 
 
         feedAdapter = FeedAdapter(mutableListOf())

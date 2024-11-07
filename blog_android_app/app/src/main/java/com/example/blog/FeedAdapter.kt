@@ -1,5 +1,6 @@
 package com.example.blog
 
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Handler
@@ -26,6 +27,7 @@ class FeedAdapter(private val items: MutableList<PostItem>) :
             val executor = Executors.newSingleThreadExecutor()
             val handler = Handler(Looper.getMainLooper())
             var image: Bitmap? = null
+
             executor.execute {
                 try {
                     val `in` = java.net.URL(postItem.imageUrl).openStream()
@@ -38,7 +40,15 @@ class FeedAdapter(private val items: MutableList<PostItem>) :
                     e.printStackTrace()
                 }
             }
+            image_view.setOnClickListener { view ->
+                val intent = Intent(view!!.context, PostActivity::class.java)
+                intent.putExtra("username", postItem.username)
+                intent.putExtra("text_content", postItem.text_content)
+                intent.putExtra("bitmap_url", postItem.imageUrl)
+                view.context.startActivity(intent)
+            }
         }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedAdapter.FeedViewHolder {
