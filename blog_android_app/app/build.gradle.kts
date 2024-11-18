@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.blog"
+    namespace = "com.example.blog_android_app"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.blog"
+        applicationId = "com.example.blog_android_app"
         minSdk = 24
         targetSdk = 34
         versionCode = 1

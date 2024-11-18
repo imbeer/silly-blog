@@ -1,4 +1,4 @@
-package com.example.blog
+package com.example.blog_android_app
 
 import org.junit.Test
 
