@@ -1,4 +1,4 @@
-package com.example.blog_android_app
+package com.example.blog_android_app.feed
 
 data class PostItem(
     val username: String,

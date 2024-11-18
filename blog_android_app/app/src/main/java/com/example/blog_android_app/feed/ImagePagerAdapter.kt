@@ -1,4 +1,4 @@
-package com.example.blog_android_app
+package com.example.blog_android_app.feed
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blog_android_app.R
 
 class ImagePagerAdapter(private val bitmapList: MutableList<Bitmap?>) :
     RecyclerView.Adapter<ImagePagerAdapter.BitmapViewHolder>() {

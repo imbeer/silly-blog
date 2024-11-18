@@ -1,4 +1,4 @@
-package com.example.blog_android_app
+package com.example.blog_android_app.feed
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.example.blog_android_app.R
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
@@ -81,7 +82,9 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val likeActive = ContextCompat.getDrawable(itemView.context, R.drawable.favorite_active)
             likebutton.setImageDrawable(likeActive)
         } else {
-            val likeInactive = ContextCompat.getDrawable(itemView.context, R.drawable.favorite_inactive)
+            val likeInactive = ContextCompat.getDrawable(itemView.context,
+                R.drawable.favorite_inactive
+            )
             likebutton.setImageDrawable(likeInactive)
         }
     }
