@@ -19,8 +19,8 @@ endif ()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(PROJECT_SOURCES
-    main.cpp
-    controllers/PostController.cpp
+    main.cc
+    controllers/PostController.cc
     controllers/PostController.h
     models/Comment.cc
     models/Comment.h
@@ -32,6 +32,8 @@ set(PROJECT_SOURCES
     models/Post.h
     models/User.cc
     models/User.h
+    filters/LoginFilter.cc
+    filters/LoginFilter.h
 )
 
 
@@ -44,9 +46,14 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
 # target_link_libraries(${PROJECT_NAME} PRIVATE drogon)
 #
 # and comment out the following lines
+add_subdirectory(3rdparty/jwt-cpp)
+add_subdirectory(3rdparty/libbcrypt)
+
 find_package(Drogon CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Drogon::Drogon
+    jwt-cpp
+    bcrypt
 )
 
 # ##############################################################################

@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.View
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -22,11 +23,13 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     val username = itemView.findViewById<TextView>(R.id.username)
     val text = itemView.findViewById<TextView>(R.id.text)
     val likebutton = itemView.findViewById<ImageButton>(R.id.like)
+//    val imageview = itemView.findViewById<ImageView>(R.id.imageview)
 
     fun bind(postItem: PostItem) {
         username.text = postItem.username
         text.text = postItem.text
         setLikeButtonIcon(postItem.like, likebutton)
+//        imageview.visibility = View.GONE
 
         if (postItem.imageUrls.isNullOrEmpty()) {
             viewPager.visibility = View.GONE
