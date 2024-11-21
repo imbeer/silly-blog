@@ -32,7 +32,7 @@ class PostFeedAdapter(private val items: MutableList<PostItem>) :
 
     fun loadInitialData() {
         val initialItems = mutableListOf<PostItem>()
-        for (i in 1..20) {
+        for (i in 1..5) {
             initialItems.add(generatePostItem(i))
         }
         addItems(initialItems)
@@ -43,7 +43,7 @@ class PostFeedAdapter(private val items: MutableList<PostItem>) :
         Handler(Looper.getMainLooper()).postDelayed({
             val newItems = mutableListOf<PostItem>()
             val start = itemCount + 1
-            for (i in start until start + 10) {
+            for (i in start until start + 5) {
                 newItems.add(generatePostItem(i))
             }
             addItems(newItems)

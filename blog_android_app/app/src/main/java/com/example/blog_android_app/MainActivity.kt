@@ -3,7 +3,9 @@ package com.example.blog_android_app
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.blog_android_app.edit.EditPostFragment
 import com.example.blog_android_app.feed.FeedFragment
+import com.example.blog_android_app.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
@@ -20,11 +22,11 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_add_post -> {
-//                    loadFragment(SearchFragment())
+                    loadFragment(EditPostFragment())
                     true
                 }
                 R.id.nav_profile -> {
-//                    loadFragment(ProfileFragment())
+                    loadFragment(ProfileFragment())
                     true
                 }
                 else -> false
