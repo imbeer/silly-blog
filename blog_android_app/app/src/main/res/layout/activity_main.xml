@@ -18,4 +18,19 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:background="@color/base"
+        app:itemTextColor="@color/nav_item_colors"
+        app:itemIconTint="@color/nav_item_colors"
+        app:itemBackground="@android:color/transparent"
+        app:rippleColor="@android:color/transparent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/navigation_bar_menu"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

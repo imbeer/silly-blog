@@ -33,13 +33,7 @@ class PostFeedAdapter(private val items: MutableList<PostItem>) :
     fun loadInitialData() {
         val initialItems = mutableListOf<PostItem>()
         for (i in 1..20) {
-            initialItems.add(
-                PostItem(
-                    "username$i",
-                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                    listOf("https://avatars.githubusercontent.com/u/76579340", "https://avatars.githubusercontent.com/u/48876018")
-                )
-            )
+            initialItems.add(generatePostItem(i))
         }
         addItems(initialItems)
     }
@@ -50,18 +44,18 @@ class PostFeedAdapter(private val items: MutableList<PostItem>) :
             val newItems = mutableListOf<PostItem>()
             val start = itemCount + 1
             for (i in start until start + 10) {
-                newItems.add(
-                    PostItem(
-                        "username$i",
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-                        listOf("https://avatars.githubusercontent.com/u/76579340", "https://avatars.githubusercontent.com/u/48876018")
-                    )
-                )
+                newItems.add(generatePostItem(i))
             }
             addItems(newItems)
 
             loading = false
         }, 100)
+    }
+
+    private fun generatePostItem(index: Int): PostItem {
+        return PostItem("username$index",
+                "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+                listOf("https://avatars.githubusercontent.com/u/76579340", "https://avatars.githubusercontent.com/u/48876018"))
     }
 
 }
