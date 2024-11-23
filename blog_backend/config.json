@@ -209,7 +209,7 @@
     //custom_config: custom configuration for users. This object can be get by the app().getCustomConfig() method.
     "custom_config": {
         "image-default":"https://static.productionready.io/images/smiley-cyrus.jpg",
-        "jwt-secret":"nRvyYC4soFxBdZ-F-5Nnzz5USXstR1YylsTd-mA0aKtI9HUlriGrtkf-TiuDapkLiUCogO3JOK7kwZisrHp6wA",
+        "jwt-secret":"f7100d32369d756880affd2ba0015226a4f1ae28eba5c43b54cf96cf7fc2cfc3",
         "jwt-sessionTime":86400
     }
 }
