@@ -28,7 +28,7 @@ void PostController::newPost(
             (*callbackPtr)(response);
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
-            // LOG_ERROR << e.base().what();
+            LOG_ERROR << e.base().what();
             auto response = HttpResponse::newHttpResponse();
             response->setStatusCode(HttpStatusCode::k400BadRequest);
             (*callbackPtr)(response);

@@ -3,6 +3,8 @@
 #include <drogon/orm/Exception.h>
 #include <drogon/orm/Mapper.h>
 
+#include <optional>
+
 const string jwtService::secret = drogon::app().getCustomConfig()["jwt-secret"].asString();
 const int jwtService::duration = drogon::app().getCustomConfig()["jwt-sessionTime"].asInt();
 const verifier<default_clock, traits::kazuho_picojson> jwtService::_verifier = verify()
@@ -38,17 +40,13 @@ auto jwtService::getCurrentUserIdFromRequest(const HttpRequestPtr &req) -> optio
     return getUserIdFromJwt(token);
 }
 
-auto jwtService::getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback) -> void
+std::optional<drogon_model::blog::User> jwtService::getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback)
 {
-    drogon::orm::Mapper<User> userMapper = drogon::orm::Mapper<User>(app().getFastDbClient());
+    drogon::orm::Mapper<User> userMapper = drogon::orm::Mapper<User>(app().getDbClient());
     auto id = getCurrentUserIdFromRequest(req);
     if (!id.has_value()) {
-        callback(nullopt);
-        return;
+        return nullopt;
     }
-    userMapper.findByPrimaryKey(id.value(), [callback](const User &user) {
-        callback(user);
-    },[callback](const drogon::orm::DrogonDbException &e) {
-                                    callback(nullopt);
-                                });
+    auto user = userMapper.findByPrimaryKey(id.value());
+    return user;
 }

@@ -14,8 +14,9 @@ class LoginFilter : public HttpFilter<LoginFilter>
 {
   public:
     LoginFilter() = default;
-    void doFilter(const HttpRequestPtr &req,
-                  FilterCallback &&fcb,
-                  FilterChainCallback &&fccb) override;
+    void doFilter(
+        const HttpRequestPtr &req,
+        FilterCallback &&fcb,
+        FilterChainCallback &&fccb) override;
 };
 

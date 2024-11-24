@@ -1,6 +1,8 @@
 #define DROGON_TEST_MAIN
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
+// #include "../utils/jwtservice.h"
+// #include "../models/User.h"
 
 DROGON_TEST(GetPostsTest)
 {
@@ -21,7 +23,6 @@ DROGON_TEST(GetPostsTest)
         request,
         [TEST_CTX, author, offset, limit](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
-                // Print the URL with parameters and the response data
                 cout << "Request URL: /posts?author=" << author
                      << "&offset=" << offset << "&limit=" << limit << endl;
                 cout << "Status Code: " << response->getStatusCode() << endl;
@@ -37,6 +38,7 @@ DROGON_TEST(GetPostsTest)
 
 DROGON_TEST(NewPostsTest)
 {
+    // todo: add user login and then get jwt from it, cause idk what is wrong with this token.
     using namespace drogon;
     using namespace std;
 
@@ -49,6 +51,12 @@ DROGON_TEST(NewPostsTest)
     auto request = HttpRequest::newHttpJsonRequest(postData);
     request->setMethod(Post);
     request->setPath("/posts");
+
+    // drogon_model::blog::User user;
+    // user.setUserId(1);
+    // user.setUsername("mcgeechristopher");
+    std::string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIxIn0.pedUAR9iyk2acGSucfwXq31GtH9ms6YokZCi5ilu9hQ";
+    request->addHeader("Authorization", "Bearer " + token);
 
     client->sendRequest(
         request,
