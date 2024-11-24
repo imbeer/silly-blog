@@ -15,6 +15,9 @@ void PostController::newPost(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+
+    newPost.setTime(::trantor::Date::now());
+
     m_postMapper.insert(
         newPost,
         [callbackPtr](const drogon_model::blog::Post &post) {
@@ -32,11 +35,33 @@ void PostController::newPost(
         });
 }
 
-void PostController::getAllPosts(
+
+// void PostController::updatePost(
+//     drogon_model::blog::Post &&newPost,
+//     function<void(const HttpResponsePtr &)> &&callback)
+// {
+//     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+//     m_postMapper.findByPrimaryKey(
+//         newPost.getPrimaryKey(),
+//         [callbackPtr](const drogon_model::blog::Post &post) {
+
+//         },
+//         [callbackPtr](const drogon::orm::DrogonDbException &e) {
+//             Json::Value responseBody;
+//             responseBody["error"] = e.base().what();
+//             auto response = HttpResponse::newHttpJsonResponse(responseBody);
+//             response->setStatusCode(HttpStatusCode::k404NotFound);
+//             (*callbackPtr)(response);
+//         }
+//         );
+// }
+
+
+void PostController::getPosts(
     const HttpRequestPtr& req,
     std::function<void (const HttpResponsePtr &)> &&callback,
     const string &authorUsername,
-    int offset, int limit)
+    const int offset, const int limit)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     Json::Value responseBody;

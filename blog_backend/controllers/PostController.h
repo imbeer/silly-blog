@@ -10,18 +10,22 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(PostController::newPost, "/posts", drogon::Post, "LoginFilter");
-        ADD_METHOD_TO(PostController::getAllPosts, "/posts?author={}&offset={}&limit={}", Get);
+        ADD_METHOD_TO(PostController::newPost, "/posts", drogon::Post/*, "LoginFilter"*/);
+        // ADD_METHOD_TO(PostController::updatePost, "/posts", drogon::Put, "LoginFilter");
+        ADD_METHOD_TO(PostController::getPosts, "/posts?author={}&offset={}&limit={}", Get);
     METHOD_LIST_END
 
     void newPost(
         drogon_model::blog::Post &&newPost,
         function<void(const HttpResponsePtr &)> &&callback);
-    void getAllPosts(
+    // void updatePost(
+    //     drogon_model::blog::Post &&newPost,
+    //     function<void(const HttpResponsePtr &)> &&callback);
+    void getPosts(
         const HttpRequestPtr& req,
         std::function<void (const HttpResponsePtr &)> &&callback,
         const string &author,
-        int offset, int limit);
+        const int offset, const int limit);
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
