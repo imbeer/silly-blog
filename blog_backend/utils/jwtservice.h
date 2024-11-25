@@ -11,11 +11,11 @@ using namespace jwt;
 
 class jwtService {
 public:
-    static auto generateFromUser(const User& user) -> string;
+    static string generateFromUser(const User& user);
 
-    static auto getUserIdFromJwt(const string& token) -> optional<int>;
+    static optional<int> getUserIdFromJwt(const string& token);
 
-    static auto getCurrentUserIdFromRequest(const HttpRequestPtr &req) -> optional<int>;
+    static optional<int> getCurrentUserIdFromRequest(const HttpRequestPtr &req);
 
     static std::optional<drogon_model::blog::User> getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback);
 

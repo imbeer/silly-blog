@@ -11,7 +11,7 @@ const verifier<default_clock, traits::kazuho_picojson> jwtService::_verifier = v
                                                           .allow_algorithm(algorithm::hs256{jwtService::secret})
                                                           .with_issuer("auth0");
 
-auto jwtService::generateFromUser(const User& user) -> string
+string jwtService::generateFromUser(const User& user)
 {
     return jwt::create()
     .set_issuer("auth0")
@@ -22,7 +22,7 @@ auto jwtService::generateFromUser(const User& user) -> string
         .sign(jwt::algorithm::hs256{secret});
 }
 
-auto jwtService::getUserIdFromJwt(const string& token) -> optional<int>
+optional<int> jwtService::getUserIdFromJwt(const string& token)
 {
     auto decoded = jwt::decode(token);
     try {
@@ -34,10 +34,14 @@ auto jwtService::getUserIdFromJwt(const string& token) -> optional<int>
     return stoi(decoded.get_payload_claim("user").as_string());
 }
 
-auto jwtService::getCurrentUserIdFromRequest(const HttpRequestPtr &req) -> optional<int>
+optional<int> jwtService::getCurrentUserIdFromRequest(const HttpRequestPtr &req)
 {
-    auto token = req->getHeader("Authorization").substr(7);
-    return getUserIdFromJwt(token);
+
+    string token = req->getHeader("Authorization");
+    if (token.length() < 7) {
+        return nullopt;
+    }
+    return getUserIdFromJwt(token.substr(7));
 }
 
 std::optional<drogon_model::blog::User> jwtService::getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback)

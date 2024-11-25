@@ -38,28 +38,49 @@ DROGON_TEST(GetPostsTest)
 
 DROGON_TEST(NewPostsTest)
 {
-    // todo: add user login and then get jwt from it, cause idk what is wrong with this token.
+    // todo: WTF WITH THIS TEST
     using namespace drogon;
     using namespace std;
 
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
-    Json::Value postData;
 
-    postData["post"]["user_id"] = 1;
-    postData["post"]["text_content"] = "This is a test post.";
+    Json::Value userData;
+    userData["user"]["username"] = "cool_test_username";
+    userData["user"]["password"] = "0000";
+    userData["user"]["email"] = "cool_test_email@gmail.com";
 
-    auto request = HttpRequest::newHttpJsonRequest(postData);
-    request->setMethod(Post);
-    request->setPath("/posts");
+    auto userRegistrationRequest = HttpRequest::newHttpJsonRequest(userData);
+    userRegistrationRequest->setMethod(Post);
+    userRegistrationRequest->setPath("/users");
 
-    // drogon_model::blog::User user;
-    // user.setUserId(1);
-    // user.setUsername("mcgeechristopher");
-    std::string token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIxIn0.pedUAR9iyk2acGSucfwXq31GtH9ms6YokZCi5ilu9hQ";
-    request->addHeader("Authorization", "Bearer " + token);
+    std::string jsonWebToken;
 
     client->sendRequest(
-        request,
+        userRegistrationRequest,
+        [TEST_CTX, &jsonWebToken](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k201Created);
+                auto json = response->getJsonObject();
+                jsonWebToken = (*json)["token"].asString();
+                cout << "jwt is: " << jsonWebToken << endl;
+            } else {
+                cerr << "Request failed with error: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    Json::Value postData;
+    postData["post"]["user_id"] = 1;
+    postData["post"]["text_content"] = "This is a test post.";
+    cout << "jwt is: " << jsonWebToken << endl;
+
+    auto postCreationRequest = HttpRequest::newHttpJsonRequest(postData);
+    postCreationRequest->setMethod(Post);
+    postCreationRequest->setPath("/posts");
+    postCreationRequest->addHeader("Authorization", "Bearer " + jsonWebToken);
+
+    client->sendRequest(
+        postCreationRequest,
         [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k201Created);

@@ -10,18 +10,18 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(PostController::newPost, "/posts", drogon::Post, "LoginFilter");
+        ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
         // ADD_METHOD_TO(PostController::updatePost, "/posts", drogon::Put, "RightFilter");
-        ADD_METHOD_TO(PostController::getPosts, "/posts?author={}&offset={}&limit={}", Get);
+        ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get);
     METHOD_LIST_END
 
-    void newPost(
+    void create(
         drogon_model::blog::Post &&newPost,
         function<void(const HttpResponsePtr &)> &&callback);
     // void updatePost(
     //     drogon_model::blog::Post &&newPost,
     //     function<void(const HttpResponsePtr &)> &&callback);
-    void getPosts(
+    void get(
         const HttpRequestPtr& req,
         std::function<void (const HttpResponsePtr &)> &&callback,
         const string &author,

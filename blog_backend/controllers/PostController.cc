@@ -10,7 +10,7 @@ inline drogon_model::blog::Post fromRequest(const HttpRequest &req) {
 }
 }
 
-void PostController::newPost(
+void PostController::create(
     drogon_model::blog::Post &&newPost,
     function<void(const HttpResponsePtr &)> &&callback)
 {
@@ -57,7 +57,7 @@ void PostController::newPost(
 // }
 
 
-void PostController::getPosts(
+void PostController::get(
     const HttpRequestPtr& req,
     std::function<void (const HttpResponsePtr &)> &&callback,
     const string &authorUsername,

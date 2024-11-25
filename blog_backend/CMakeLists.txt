@@ -22,6 +22,8 @@ set(PROJECT_SOURCES
     main.cc
     controllers/PostController.cc
     controllers/PostController.h
+    controllers/UserController.cc
+    controllers/UserController.h
     models/Comment.cc
     models/Comment.h
     models/Image.cc
