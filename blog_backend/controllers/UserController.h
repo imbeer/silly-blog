@@ -12,11 +12,12 @@ class UserController: public drogon::HttpController<UserController>
 public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(UserController::create, "/users", drogon::Post);
+        ADD_METHOD_TO(UserController::login, "/users/login", drogon::Post);
     METHOD_LIST_END
 
-    // void get(
-    //     const HttpRequestPtr &req,
-    //     std::function<void(const HttpResponsePtr &)> &&callback);
+    void login(
+        User &&pNewUser,
+        std::function<void(const HttpResponsePtr &)> &&callback);
     void create(
         User &&pNewUser,
         std::function<void(const HttpResponsePtr &)> &&callback);

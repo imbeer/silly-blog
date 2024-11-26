@@ -12,6 +12,38 @@ inline drogon_model::blog::User fromRequest(const HttpRequest &req) {
 }
 }
 
+void UserController::login(
+    User &&pNewUser,
+    std::function<void(const HttpResponsePtr &)> &&callback)
+{
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+
+    m_userMapper.findOne(
+        Criteria(User::Cols::_email, CompareOperator::EQ, pNewUser.getValueOfEmail()),
+        [=](const User &user) {
+            if (BCrypt::validatePassword(pNewUser.getValueOfPassword(), user.getValueOfPassword())) {
+                auto json = Json::Value();
+                json["user"] = user.toJson();
+                json["token"] = jwtService::generateFromUser(user);
+                auto resp = HttpResponse::newHttpJsonResponse(json);
+                resp->setStatusCode(HttpStatusCode::k200OK);
+                (*callbackPtr)(resp);
+            } else {
+                auto resp = HttpResponse::newHttpResponse();
+                resp->setStatusCode(HttpStatusCode::k401Unauthorized);
+                (*callbackPtr)(resp);
+            }
+        },
+        [callbackPtr](const DrogonDbException &e) {
+            LOG_ERROR << e.base().what();
+            auto resp = HttpResponse::newHttpResponse();
+            resp->setStatusCode(HttpStatusCode::k400BadRequest);
+            (*callbackPtr)(resp);
+        }
+        );
+}
+
+
 void UserController::create(
     User &&pNewUser,
     std::function<void(const HttpResponsePtr &)> &&callback)
@@ -37,12 +69,10 @@ void UserController::create(
             json["token"] = jwtService::generateFromUser(user);
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
-            std::cout << "new user created, jwt: " << json["token"] << endl;
             (*callbackPtr)(response);
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
             LOG_ERROR << e.base().what();
-            std::cerr << "did not create new user" << endl;
             auto response = HttpResponse::newHttpResponse();
             response->setStatusCode(HttpStatusCode::k400BadRequest);
             (*callbackPtr)(response);
@@ -52,7 +82,6 @@ void UserController::create(
 bool UserController::isInputUserAllowed(const User &user)
 {
     if (user.getEmail() == nullptr || user.getUsername() == nullptr || user.getPassword() == nullptr) {
-        std::cout << "no email, username or password" << endl;
         return false;
     }
 
