@@ -37,7 +37,7 @@ void UserController::create(
             json["token"] = jwtService::generateFromUser(user);
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
-            std::cout << "new user created" << endl;
+            std::cout << "new user created, jwt: " << json["token"] << endl;
             (*callbackPtr)(response);
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
@@ -52,6 +52,7 @@ void UserController::create(
 bool UserController::isInputUserAllowed(const User &user)
 {
     if (user.getEmail() == nullptr || user.getUsername() == nullptr || user.getPassword() == nullptr) {
+        std::cout << "no email, username or password" << endl;
         return false;
     }
 
