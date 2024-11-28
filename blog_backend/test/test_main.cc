@@ -38,7 +38,6 @@ DROGON_TEST(GetPostsTest)
 
 DROGON_TEST(NewPostsTest)
 {
-    // todo: WTF WITH THIS TEST
     using namespace drogon;
     using namespace std;
 
@@ -47,7 +46,6 @@ DROGON_TEST(NewPostsTest)
     Json::Value postData;
     postData["post"]["user_id"] = 205;
     postData["post"]["text_content"] = "This is a test post.";
-    // cout << "jwt is: " << jsonWebToken << endl;
     string jsonWebToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
 
     auto postCreationRequest = HttpRequest::newHttpJsonRequest(postData);
@@ -75,9 +73,9 @@ DROGON_TEST(NewUserTest)
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
 
     Json::Value userData;
-    userData["user"]["username"] = "cool_test_username_2";
+    userData["user"]["username"] = "cool_test_username_5";
     userData["user"]["password"] = "0000";
-    userData["user"]["email"] = "cool_test_email2@gmail.com";
+    userData["user"]["email"] = "cool_test_email5@gmail.com";
 
     auto userRegistrationRequest = HttpRequest::newHttpJsonRequest(userData);
     userRegistrationRequest->setMethod(Post);
@@ -90,6 +88,37 @@ DROGON_TEST(NewUserTest)
                 CHECK(response->getStatusCode() == k201Created);
                 auto json = response->getJsonObject();
                 string jsonWebToken = (*json)["token"].asString();
+                cout << "jwt is: " << jsonWebToken << endl;
+            } else {
+                cerr << "Request failed with error: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+}
+
+DROGON_TEST(LoginUserTest)
+{
+    using namespace drogon;
+    using namespace std;
+
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+
+    Json::Value userData;
+    userData["user"]["password"] = "0000";
+    userData["user"]["email"] = "cool_test_email3@gmail.com";
+
+    auto userRegistrationRequest = HttpRequest::newHttpJsonRequest(userData);
+    userRegistrationRequest->setMethod(Post);
+    userRegistrationRequest->setPath("/users/login");
+
+    client->sendRequest(
+        userRegistrationRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k200OK);
+                auto json = response->getJsonObject();
+                string jsonWebToken = (*json)["token"].asString();
+                CHECK((*json)["user"]["username"] == "cool_test_username_3");
                 cout << "jwt is: " << jsonWebToken << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;

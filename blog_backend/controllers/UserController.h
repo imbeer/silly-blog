@@ -26,6 +26,5 @@ private:
     bool isInputUserAllowed(const User &user);
 
 private:
-
     Mapper<User> m_userMapper = Mapper<User>(app().getDbClient());
 };

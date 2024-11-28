@@ -36,15 +36,37 @@ void PostController::create(
 }
 
 
-// void PostController::updatePost(
+// void PostController::update(
 //     drogon_model::blog::Post &&newPost,
 //     function<void(const HttpResponsePtr &)> &&callback)
 // {
 //     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-//     m_postMapper.findByPrimaryKey(
-//         newPost.getPrimaryKey(),
-//         [callbackPtr](const drogon_model::blog::Post &post) {
-
+//     m_postMapper.findOne(
+//         Criteria(drogon_model::blog::Post::Cols::_post_id, CompareOperator::EQ, newPost.getPostId()),
+//         [callbackPtr, &newPost, this](const drogon_model::blog::Post &post) {
+//             if (newPost.getTextContent() == nullptr) {
+//                 newPost.setTextContent(post.getValueOfTextContent());
+//             }
+//             if (newPost.getUserId() == nullptr) {
+//                 newPost.setPostId(post.getValueOfPostId());
+//             }
+//             if (newPost.getTime() == nullptr) {
+//                 newPost.setTime(post.getValueOfTime());
+//             }
+//             m_postMapper.update(
+//                 newPost,
+//                 [callbackPtr, newPost](const size_t size){
+//                     auto json = Json::Value();
+//                     json["post"] = newPost.toJson();
+//                     auto resp = HttpResponse::newHttpJsonResponse(json);
+//                     (*callbackPtr)(resp);
+//                 },
+//                 [callbackPtr](const DrogonDbException &e){
+//                     LOG_ERROR << e.base().what();
+//                     auto resp = HttpResponse::newHttpResponse();
+//                     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+//                     (*callbackPtr)(resp);
+//                 });
 //         },
 //         [callbackPtr](const drogon::orm::DrogonDbException &e) {
 //             Json::Value responseBody;

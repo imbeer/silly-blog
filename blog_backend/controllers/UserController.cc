@@ -21,7 +21,14 @@ void UserController::login(
     m_userMapper.findOne(
         Criteria(User::Cols::_email, CompareOperator::EQ, pNewUser.getValueOfEmail()),
         [=](const User &user) {
-            if (BCrypt::validatePassword(pNewUser.getValueOfPassword(), user.getValueOfPassword())) {
+            // todo: password validation do not work.
+            auto passhash = user.getValueOfPassword();
+
+            size_t end = passhash.find_last_not_of(' ');
+            if (end != std::string::npos)
+                passhash.erase(end + 1);
+
+            if (BCrypt::validatePassword(pNewUser.getValueOfPassword(), passhash)) {
                 auto json = Json::Value();
                 json["user"] = user.toJson();
                 json["token"] = jwtService::generateFromUser(user);

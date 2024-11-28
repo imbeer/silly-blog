@@ -9,9 +9,10 @@
 
 using namespace drogon;
 
-void RightFilter::doFilter(const HttpRequestPtr &req,
-                         FilterCallback &&fcb,
-                         FilterChainCallback &&fccb)
+void RightFilter::doFilter(
+    const HttpRequestPtr &req,
+    FilterCallback &&fcb,
+    FilterChainCallback &&fccb)
 {
     auto userId = jwtService::getCurrentUserIdFromRequest(req);
     drogon::orm::Mapper<User> userMapper = drogon::orm::Mapper<User>(app().getDbClient());
