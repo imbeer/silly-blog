@@ -21,7 +21,6 @@ void UserController::login(
     m_userMapper.findOne(
         Criteria(User::Cols::_email, CompareOperator::EQ, pNewUser.getValueOfEmail()),
         [=](const User &user) {
-            // todo: password validation do not work.
             auto passhash = user.getValueOfPassword();
 
             size_t end = passhash.find_last_not_of(' ');

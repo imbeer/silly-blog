@@ -20,7 +20,7 @@ void RightFilter::doFilter(
 
     auto json = req->getJsonObject();
     auto postUserId = (*json)["post"]["userId"];
-    if (userId.has_value() && (userId.value() == postUserId.asInt() || user.getIsAdmin())) {
+    if (userId.has_value() && (userId.value() == postUserId.asInt() || *user.getIsAdmin())) {
         fccb();
         return;
     }

@@ -11,16 +11,16 @@ class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
-        // ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "RightFilter");
+        ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "RightFilter");
         ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get);
     METHOD_LIST_END
 
     void create(
         drogon_model::blog::Post &&newPost,
         function<void(const HttpResponsePtr &)> &&callback);
-    // void update(
-    //     drogon_model::blog::Post &&newPost,
-    //     function<void(const HttpResponsePtr &)> &&callback);
+    void update(
+        drogon_model::blog::Post &&newPost,
+        function<void(const HttpResponsePtr &)> &&callback);
     void get(
         const HttpRequestPtr& req,
         std::function<void (const HttpResponsePtr &)> &&callback,
