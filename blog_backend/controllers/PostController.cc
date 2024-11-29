@@ -35,7 +35,6 @@ void PostController::create(
         });
 }
 
-
 void PostController::update(
     drogon_model::blog::Post &&newPost,
     function<void(const HttpResponsePtr &)> &&callback)
@@ -53,18 +52,24 @@ void PostController::update(
             if (newPost.getTime() == nullptr) {
                 newPost.setTime(post.getValueOfTime());
             }
+            if (newPost.getUserId() == nullptr) {
+                newPost.setUserId(post.getValueOfUserId());
+            }
             m_postMapper.update(
                 newPost,
                 [callbackPtr, newPost](const size_t size){
                     auto json = Json::Value();
                     json["post"] = newPost.toJson();
                     auto resp = HttpResponse::newHttpJsonResponse(json);
+                    resp->setStatusCode(HttpStatusCode::k200OK);
+                    cout << "updated" << endl;
                     (*callbackPtr)(resp);
                 },
                 [callbackPtr](const DrogonDbException &e){
                     LOG_ERROR << e.base().what();
                     auto resp = HttpResponse::newHttpResponse();
                     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+                    cout << "not updated" << endl;
                     (*callbackPtr)(resp);
                 });
         },
@@ -73,11 +78,10 @@ void PostController::update(
             responseBody["error"] = e.base().what();
             auto response = HttpResponse::newHttpJsonResponse(responseBody);
             response->setStatusCode(HttpStatusCode::k404NotFound);
+            cout << "not found" << endl;
             (*callbackPtr)(response);
-        }
-        );
+        });
 }
-
 
 void PostController::get(
     const HttpRequestPtr& req,
