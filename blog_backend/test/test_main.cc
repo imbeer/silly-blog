@@ -45,7 +45,7 @@ DROGON_TEST(NewPostsTest)
     string nonOwnerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDgifQ.BS8gjxz-_ujhRb5LER11Op0YVCM6ds8fgIC16pbPtuo";
 
     Json::Value postData;
-    postData["post"]["user_id"] = 205;
+    postData["post"]["user_id"] = 206;
     postData["post"]["text_content"] = "This is a test post.";
 
     auto postCreationRequest = HttpRequest::newHttpJsonRequest(postData);

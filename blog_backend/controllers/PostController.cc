@@ -36,15 +36,15 @@ void PostController::create(
 }
 
 void PostController::update(
-    drogon_model::blog::Post &&newPost,
+    drogon_model::blog::Post &&editedPost,
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
 
     try {
         auto json = Json::Value();
-        auto post = m_postMapper.findByPrimaryKey(newPost.getValueOfPostId());
-        post.setTextContent(newPost.getValueOfTextContent());
+        auto post = m_postMapper.findByPrimaryKey(editedPost.getValueOfPostId());
+        post.setTextContent(editedPost.getValueOfTextContent());
         m_postMapper.update(post);
         json["post"] = post.toJson();
         auto resp = HttpResponse::newHttpJsonResponse(json);
@@ -72,6 +72,22 @@ void PostController::update(
         resp->setStatusCode(HttpStatusCode::k400BadRequest);
         cout << "not found" << endl;
         (*callbackPtr)(resp);
+
+    }
+}
+
+void PostController::remove(
+    drogon_model::blog::Post &&deletedPost,
+    function<void(const HttpResponsePtr &)> &&callback)
+{
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+
+    const int postId = deletedPost.getValueOfPostId();
+
+    try {
+        // todo: deletion in comments, likes and this post
+        // also in post-to-image
+    } catch (const std::exception &e) {
 
     }
 }
