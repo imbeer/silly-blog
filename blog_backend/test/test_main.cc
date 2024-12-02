@@ -64,10 +64,8 @@ DROGON_TEST(NewPostsTest)
             }
         });
 
-    // todo: this shit crushes everything.
     auto newPostJson = Json::Value();
     newPostJson["post"]["post_id"] = 1020;
-    newPostJson["post"]["user_id"] = 205;
     newPostJson["post"]["text_content"] = "edited text content";
 
     auto postEditFromOwnerRequest = HttpRequest::newHttpJsonRequest(newPostJson);
