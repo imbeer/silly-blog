@@ -44,13 +44,13 @@ optional<int> jwtService::getCurrentUserIdFromRequest(const HttpRequestPtr &req)
     return getUserIdFromJwt(token.substr(7));
 }
 
-std::optional<drogon_model::blog::User> jwtService::getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback)
+std::optional<drogon_model::blog::User> jwtService::getCurrentUserFromRequest(const HttpRequestPtr &req)
 {
-    drogon::orm::Mapper<User> userMapper = drogon::orm::Mapper<User>(app().getDbClient());
+    drogon::orm::Mapper<drogon_model::blog::User> userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
     auto id = getCurrentUserIdFromRequest(req);
     if (!id.has_value()) {
         return nullopt;
     }
-    auto user = userMapper.findByPrimaryKey(id.value());
+    auto user = make_optional(userMapper.findByPrimaryKey(id.value()));
     return user;
 }

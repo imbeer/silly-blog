@@ -17,7 +17,7 @@ public:
 
     static optional<int> getCurrentUserIdFromRequest(const HttpRequestPtr &req);
 
-    static std::optional<drogon_model::blog::User> getCurrentUserFromRequest(const HttpRequestPtr &req, const function<void(optional<User>)>& callback);
+    static std::optional<drogon_model::blog::User> getCurrentUserFromRequest(const HttpRequestPtr &req);
 
 private:
     static const string secret;

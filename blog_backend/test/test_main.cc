@@ -21,10 +21,10 @@ DROGON_TEST(GetPostsTest)
         request,
         [TEST_CTX, author, offset, limit](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
-                cout << "Request URL: /posts?author=" << author
-                     << "&offset=" << offset << "&limit=" << limit << endl;
-                cout << "Status Code: " << response->getStatusCode() << endl;
-                cout << "Response Body: " << response->getBody() << endl;
+                // cout << "Request URL: /posts?author=" << author
+                //      << "&offset=" << offset << "&limit=" << limit << endl;
+                // cout << "Status Code: " << response->getStatusCode() << endl;
+                // cout << "Response Body: " << response->getBody() << endl;
 
                 CHECK(response->getStatusCode() == k200OK);
             } else {
@@ -66,7 +66,7 @@ DROGON_TEST(NewPostsTest)
 
     // todo: this shit crushes everything.
     auto newPostJson = Json::Value();
-    newPostJson["post"]["post_id"] = 1002;
+    newPostJson["post"]["post_id"] = 1020;
     newPostJson["post"]["user_id"] = 205;
     newPostJson["post"]["text_content"] = "edited text content";
 
