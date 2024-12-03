@@ -15,7 +15,6 @@ public:
         ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "RightFilter");
         ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "RightFilter");
         ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get);
-        // ADD_METHOD_TO(PostController::like, "/posts/like", drogon::Post, "LoginFilter");
     METHOD_LIST_END
 
     void create(
@@ -40,4 +39,5 @@ private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::User> m_userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::Like> m_likeMapper = drogon::orm::Mapper<drogon_model::blog::Like>(app().getDbClient());
+
 };
