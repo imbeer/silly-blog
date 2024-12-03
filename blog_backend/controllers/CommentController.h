@@ -19,6 +19,15 @@ public:
         ADD_METHOD_TO(CommentController::remove, "/post/comment", Delete, "LoginFilter");
     METHOD_LIST_END
 
+    void get(
+        const HttpRequestPtr &req,
+        std::function<void(const HttpResponsePtr &)> &&callback,
+        const int postId,
+        const string author,
+        const int offset, const int limit);
+    void create(
+        const drogon_model::blog::Comment &&newComment,
+        std::function<void(const HttpResponsePtr &)> &&callback);
     void update(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback,
@@ -27,15 +36,6 @@ public:
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback,
         std::string &&id);
-    void get(
-        const HttpRequestPtr &req,
-        std::function<void(const HttpResponsePtr &)> &&callback,
-        const int postId,
-        const string author,
-        const int offset, const int limit);
-    void create(
-        const HttpRequestPtr &req,
-        std::function<void(const HttpResponsePtr &)> &&callback);
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());

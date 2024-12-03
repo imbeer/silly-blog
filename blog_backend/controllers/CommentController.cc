@@ -54,22 +54,43 @@ void CommentController::get(
     response->setStatusCode(HttpStatusCode::k200OK);
     (*callbackPtr)(response);
 }
+
 void CommentController::create(
-    const HttpRequestPtr &req,
+    const drogon_model::blog::Comment &&newComment,
     std::function<void(const HttpResponsePtr &)> &&callback)
 {
+    // todo: тож проверку на пользователя
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+
+    m_commentMapper.insert(
+        newComment,
+        [callbackPtr](const drogon_model::blog::Comment &comment) {
+            auto json = Json::Value();
+            json["comment"] = comment.toJson();
+            auto response = HttpResponse::newHttpJsonResponse(json);
+            response->setStatusCode(HttpStatusCode::k201Created);
+            (*callbackPtr)(response);
+        },
+        [callbackPtr](const drogon::orm::DrogonDbException &e) {
+            LOG_ERROR << e.base().what();
+            auto response = HttpResponse::newHttpResponse();
+            response->setStatusCode(HttpStatusCode::k400BadRequest);
+            (*callbackPtr)(response);
+        });
 }
+
 void CommentController::update(
     const HttpRequestPtr &req,
     std::function<void(const HttpResponsePtr &)> &&callback,
     std::string &&id)
 {
-}
 
+}
 
 void CommentController::remove(
     const HttpRequestPtr &req,
     std::function<void(const HttpResponsePtr &)> &&callback,
     std::string &&id)
 {
+
 }

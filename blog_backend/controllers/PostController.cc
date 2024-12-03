@@ -14,6 +14,7 @@ void PostController::create(
     drogon_model::blog::Post &&newPost,
     function<void(const HttpResponsePtr &)> &&callback)
 {
+    // todo: i forgor добавить проверку на пользователя
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
 
     newPost.setTime(::trantor::Date::now());
