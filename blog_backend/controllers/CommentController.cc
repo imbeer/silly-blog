@@ -1,15 +1,7 @@
 #include "CommentController.h"
 #include <string>
-
-namespace drogon {
-template<>
-inline drogon_model::blog::Comment fromRequest(const HttpRequest &req) {
-    auto json = req.getJsonObject();
-    auto commentJson = (*json)["comment"];
-    auto comment = drogon_model::blog::Comment(commentJson);
-    return comment;
-}
-}
+#include "../utils/parseservice.h"
+#include "../utils/jwtservice.h"
 
 void CommentController::get(
     const HttpRequestPtr &req,
@@ -56,11 +48,15 @@ void CommentController::get(
 }
 
 void CommentController::create(
-    const drogon_model::blog::Comment &&newComment,
+    const HttpRequestPtr &req,
     std::function<void(const HttpResponsePtr &)> &&callback)
 {
-    // todo: тож проверку на пользователя
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    auto newComment = parseService::getCommentFromRequest(*req);
+    int userId = jwtService::getCurrentUserIdFromRequest(req).value();
+
+    newComment.setUserId(userId);
+    newComment.setTime(::trantor::Date::now());
 
     m_commentMapper.insert(
         newComment,
@@ -84,7 +80,37 @@ void CommentController::update(
     std::function<void(const HttpResponsePtr &)> &&callback,
     std::string &&id)
 {
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    auto editedComment = parseService::getCommentFromRequest(*req);
 
+    try {
+        auto json = Json::Value();
+        auto comment= m_commentMapper.findByPrimaryKey(editedComment.getValueOfCommentId());
+        comment.setTextContent(editedComment.getValueOfTextContent());
+        m_commentMapper.update(comment);
+        json["comment"] = comment.toJson();
+        auto resp = HttpResponse::newHttpJsonResponse(json);
+        resp->setStatusCode(HttpStatusCode::k200OK);
+        (*callbackPtr)(resp);
+
+    } catch (const std::exception &e) {
+        LOG_ERROR << e.what();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        (*callbackPtr)(resp);
+
+    }
+    // } catch (const UnexpectedRows &e) {
+    //     LOG_ERROR << e.what();
+    //     auto resp = HttpResponse::newHttpResponse();
+    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+    //     (*callbackPtr)(resp);
+
+    // } catch (const DrogonDbException &e) {
+    //     LOG_ERROR << e.base().what();
+    //     auto resp = HttpResponse::newHttpResponse();
+    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+    //     (*callbackPtr)(resp);
 }
 
 void CommentController::remove(
@@ -92,5 +118,17 @@ void CommentController::remove(
     std::function<void(const HttpResponsePtr &)> &&callback,
     std::string &&id)
 {
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    const int commentId = parseService::getCommentIdFromRequest(*req);
 
+    try {
+        m_commentMapper.deleteByPrimaryKey(commentId);
+
+    } catch (const std::exception &e) {
+        LOG_ERROR << e.what();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        (*callbackPtr)(resp);
+
+    }
 }

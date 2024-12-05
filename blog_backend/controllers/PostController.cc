@@ -48,20 +48,6 @@ void PostController::update(
         cout << "updated" << endl;
         (*callbackPtr)(resp);
 
-    } catch (const UnexpectedRows &e) {
-        LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "unexpected rows" << endl;
-        (*callbackPtr)(resp);
-
-    } catch (const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "not found" << endl;
-        (*callbackPtr)(resp);
-
     } catch (const std::exception &e) {
         LOG_ERROR << e.what();
         auto resp = HttpResponse::newHttpResponse();
@@ -70,6 +56,19 @@ void PostController::update(
         (*callbackPtr)(resp);
 
     }
+    // } catch (const UnexpectedRows &e) {
+    //     LOG_ERROR << e.what();
+    //     auto resp = HttpResponse::newHttpResponse();
+    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+    //     cout << "unexpected rows" << endl;
+    //     (*callbackPtr)(resp);
+
+    // } catch (const DrogonDbException &e) {
+    //     LOG_ERROR << e.base().what();
+    //     auto resp = HttpResponse::newHttpResponse();
+    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
+    //     cout << "not found" << endl;
+    //     (*callbackPtr)(resp);
 }
 
 void PostController::remove(
@@ -77,9 +76,7 @@ void PostController::remove(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto deletedPost = parseService::getPostFromRequest(*req);
-
-    const int postId = deletedPost.getValueOfPostId();
+    const int postId = parseService::getPostIdFromRequest(*req);
 
     try {
         auto commentCriteria = Criteria(

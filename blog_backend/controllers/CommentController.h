@@ -26,7 +26,7 @@ public:
         const string author,
         const int offset, const int limit);
     void create(
-        const drogon_model::blog::Comment &&newComment,
+        const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback);
     void update(
         const HttpRequestPtr &req,
