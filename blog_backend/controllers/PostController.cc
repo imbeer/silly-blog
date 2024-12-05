@@ -1,22 +1,15 @@
 #include "PostController.h"
-
-namespace drogon {
-template<>
-inline drogon_model::blog::Post fromRequest(const HttpRequest &req) {
-    auto json = req.getJsonObject();
-    auto postJson = (*json)["post"];
-    auto post = drogon_model::blog::Post(postJson);
-    return post;
-}
-}
+#include "../utils/jwtservice.h"
 
 void PostController::create(
-    drogon_model::blog::Post &&newPost,
+    const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
 {
-    // todo: i forgor добавить проверку на пользователя
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    auto newPost = getPostFromRequest(*req);
+    auto userId = jwtService::getCurrentUserIdFromRequest(req);
 
+    newPost.setPostId(userId.value());
     newPost.setTime(::trantor::Date::now());
 
     m_postMapper.insert(
@@ -37,10 +30,11 @@ void PostController::create(
 }
 
 void PostController::update(
-    drogon_model::blog::Post &&editedPost,
+    const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    auto editedPost = getPostFromRequest(*req);
 
     try {
         auto json = Json::Value();
@@ -78,10 +72,11 @@ void PostController::update(
 }
 
 void PostController::remove(
-    drogon_model::blog::Post &&deletedPost,
+    const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    auto deletedPost = getPostFromRequest(*req);
 
     const int postId = deletedPost.getValueOfPostId();
 
@@ -94,7 +89,7 @@ void PostController::remove(
 }
 
 void PostController::get(
-    const HttpRequestPtr& req,
+    const HttpRequestPtr &req,
     std::function<void (const HttpResponsePtr &)> &&callback,
     const string &authorUsername,
     const int offset, const int limit)

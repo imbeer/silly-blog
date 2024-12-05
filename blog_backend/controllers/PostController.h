@@ -18,22 +18,24 @@ public:
     METHOD_LIST_END
 
     void create(
-        drogon_model::blog::Post &&newPost,
+        const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
     void update(
-        drogon_model::blog::Post &&editedPost,
+        const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
     void remove(
-        drogon_model::blog::Post &&deletedPost,
+        const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
     void get(
-        const HttpRequestPtr& req,
+        const HttpRequestPtr &req,
         std::function<void (const HttpResponsePtr &)> &&callback,
         const string &author,
         const int offset, const int limit);
-    void like(
-        const HttpRequestPtr& req,
-        std::function<void (const HttpResponsePtr &)> && callback);
+
+private:
+    inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
+        return drogon_model::blog::Post((*req.getJsonObject())["post"]);
+    }
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
