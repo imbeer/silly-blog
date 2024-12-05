@@ -26,6 +26,8 @@ set(PROJECT_SOURCES
     controllers/UserController.h
     controllers/CommentController.cc
     controllers/CommentController.h
+    controllers/LikeController.cc
+    controllers/LikeController.h
     models/Comment.cc
     models/Comment.h
     models/Image.cc
