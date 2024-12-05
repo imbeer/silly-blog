@@ -3,6 +3,8 @@
 #include "../models/Post.h"
 #include "../models/User.h"
 #include "../models/Like.h"
+#include "../models/Comment.h"
+#include "../models/Image.h"
 
 using namespace drogon;
 using namespace std;
@@ -36,5 +38,7 @@ private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::User> m_userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::Like> m_likeMapper = drogon::orm::Mapper<drogon_model::blog::Like>(app().getDbClient());
+    drogon::orm::Mapper<drogon_model::blog::Comment> m_commentMapper = drogon::orm::Mapper<drogon_model::blog::Comment>(app().getDbClient());
+    drogon::orm::Mapper<drogon_model::blog::Image> m_imageMapper = drogon::orm::Mapper<drogon_model::blog::Image>(app().getDbClient());
 
 };

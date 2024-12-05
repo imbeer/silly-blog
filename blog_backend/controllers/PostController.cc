@@ -82,10 +82,29 @@ void PostController::remove(
     const int postId = deletedPost.getValueOfPostId();
 
     try {
-        // todo: deletion in comments, likes and this post
-        // also in post-to-image
+        auto commentCriteria = Criteria(
+            drogon_model::blog::Comment::Cols::_post_id,
+            CompareOperator::EQ,
+            postId);
+        auto likeCriteria = Criteria(
+            drogon_model::blog::Like::Cols::_post_id,
+            CompareOperator::EQ,
+            postId);
+        auto imageCriteria = Criteria(
+            drogon_model::blog::Image::Cols::_post_id,
+            CompareOperator::EQ,
+            postId);
+        m_commentMapper.deleteBy(commentCriteria);
+        m_likeMapper.deleteBy(likeCriteria);
+        m_imageMapper.deleteBy(imageCriteria);
+        m_postMapper.deleteByPrimaryKey(postId);
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k204NoContent);
+        (*callbackPtr)(resp);
     } catch (const std::exception &e) {
-
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        (*callbackPtr)(resp);
     }
 }
 

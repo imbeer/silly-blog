@@ -42,7 +42,6 @@ set(PROJECT_SOURCES
     filters/RightFilter.h
     utils/jwtservice.cc
     utils/jwtservice.h
-
     utils/parseservice.h
 )
 
