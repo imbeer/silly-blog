@@ -120,7 +120,6 @@ void PostController::get(
         const Criteria userCriteria(drogon_model::blog::User::Cols::_username, CompareOperator::EQ, authorUsername);
         const auto users = m_userMapper.findBy(userCriteria);
         if (users.empty()) {
-            // LOG_ERROR << "No user found with username: " << authorUsername;
             auto response = HttpResponse::newHttpResponse();
             response->setStatusCode(HttpStatusCode::k400BadRequest);
             (*callbackPtr)(response);
@@ -135,9 +134,26 @@ void PostController::get(
                            .limit(limit)
                            .offset(offset)
                            .findBy(postCriteria);
-    cout << "Posts selected: " << posts.size() << endl;
+
+    const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
+    const auto likeUserCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_user_id,
+        CompareOperator::EQ,
+        currentUserId);
+
     for (const auto &post : posts) {
-        responseBody.append(post.toJson());
+        auto postJson = post.toJson();
+        const auto likePostCriteria = Criteria(
+                drogon_model::blog::Like::Cols::_post_id,
+                CompareOperator::EQ,
+                post.getValueOfPostId());
+
+        const int likes = m_likeMapper.count(likePostCriteria);
+        const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
+
+        postJson["likes"] = likes;
+        postJson["isLiked"] = isLiked;
+        responseBody.append(postJson);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
     response->setStatusCode(HttpStatusCode::k200OK);
