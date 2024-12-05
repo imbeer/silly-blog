@@ -6,6 +6,7 @@
 
 #include "RightFilter.h"
 #include "../utils/jwtservice.h"
+#include "../utils/parseservice.h"
 
 void RightFilter::doFilter(
     const HttpRequestPtr &req,
@@ -20,7 +21,7 @@ void RightFilter::doFilter(
     }
 
     auto json = req->getJsonObject();
-    int postId = (*json)["post"]["post_id"].asInt();
+    int postId = parseService::getPostIdFromRequest(*req);
 
     auto post = postMapper.findByPrimaryKey(postId);
 

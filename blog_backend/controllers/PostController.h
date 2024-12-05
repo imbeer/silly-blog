@@ -33,11 +33,6 @@ public:
         const int offset, const int limit);
 
 private:
-    inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
-        return drogon_model::blog::Post((*req.getJsonObject())["post"]);
-    }
-
-private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::User> m_userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
     drogon::orm::Mapper<drogon_model::blog::Like> m_likeMapper = drogon::orm::Mapper<drogon_model::blog::Like>(app().getDbClient());

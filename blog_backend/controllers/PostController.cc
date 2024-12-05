@@ -1,12 +1,13 @@
 #include "PostController.h"
 #include "../utils/jwtservice.h"
+#include "../utils/parseservice.h"
 
 void PostController::create(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto newPost = getPostFromRequest(*req);
+    auto newPost = parseService::getPostFromRequest(*req);
     auto userId = jwtService::getCurrentUserIdFromRequest(req);
 
     newPost.setPostId(userId.value());
@@ -34,7 +35,7 @@ void PostController::update(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto editedPost = getPostFromRequest(*req);
+    auto editedPost = parseService::getPostFromRequest(*req);
 
     try {
         auto json = Json::Value();
@@ -76,7 +77,7 @@ void PostController::remove(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto deletedPost = getPostFromRequest(*req);
+    auto deletedPost = parseService::getPostFromRequest(*req);
 
     const int postId = deletedPost.getValueOfPostId();
 
