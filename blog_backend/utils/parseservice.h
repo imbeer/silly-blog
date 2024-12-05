@@ -7,30 +7,29 @@
 
 using namespace drogon;
 
-class parseService
+namespace parseService
 {
-public:
-    static inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
-        return drogon_model::blog::Post((*req.getJsonObject())["post"]);
-    }
+inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
+    return drogon_model::blog::Post((*req.getJsonObject())["post"]);
+}
 
-    static inline drogon_model::blog::Comment getCommentFromRequest(const HttpRequest &req) {
-        return drogon_model::blog::Comment((*req.getJsonObject())["comment"]);
-    }
+inline drogon_model::blog::Comment getCommentFromRequest(const HttpRequest &req) {
+    return drogon_model::blog::Comment((*req.getJsonObject())["comment"]);
+}
 
-    static inline drogon_model::blog::User getUserFromRequest(const HttpRequest &req) {
-        return drogon_model::blog::User((*req.getJsonObject())["user"]);
-    }
+inline drogon_model::blog::User getUserFromRequest(const HttpRequest &req) {
+    return drogon_model::blog::User((*req.getJsonObject())["user"]);
+}
 
-    static inline int getPostIdFromRequest(const HttpRequest &req) {
-        return (*req.getJsonObject())["post"]["post_id"].asInt();
-    }
+inline int getPostIdFromRequest(const HttpRequest &req) {
+    return (*req.getJsonObject())["post"]["post_id"].asInt();
+}
 
-    static inline int getCommentIdFromRequest(const HttpRequest &req) {
-        return (*req.getJsonObject())["comment"]["comment_id"].asInt();
-    }
+inline int getCommentIdFromRequest(const HttpRequest &req) {
+    return (*req.getJsonObject())["comment"]["comment_id"].asInt();
+}
 
-    static inline int getUserIdFromRequest(const HttpRequest &req) {
-        return (*req.getJsonObject())["user"]["user_id"].asInt();
-    }
+inline int getUserIdFromRequest(const HttpRequest &req) {
+    return (*req.getJsonObject())["user"]["user_id"].asInt();
+}
 };
