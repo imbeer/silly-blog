@@ -14,8 +14,8 @@ class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
-        ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "RightFilter");
-        ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "RightFilter");
+        ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "PostRightFilter");
+        ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "PostRightFilter");
         ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get, "LoginFilter");
     METHOD_LIST_END
 
@@ -33,9 +33,6 @@ public:
         std::function<void (const HttpResponsePtr &)> &&callback,
         const string &author,
         const int offset, const int limit);
-    void sendEmptyResponse(
-        const std::shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
-        const HttpStatusCode &code);
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());

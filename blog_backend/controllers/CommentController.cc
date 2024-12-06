@@ -2,6 +2,7 @@
 #include <string>
 #include "../utils/parseservice.h"
 #include "../utils/jwtservice.h"
+#include "../utils/httpservice.h"
 
 void CommentController::get(
     const HttpRequestPtr &req,
@@ -69,9 +70,7 @@ void CommentController::create(
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
             LOG_ERROR << e.base().what();
-            auto response = HttpResponse::newHttpResponse();
-            response->setStatusCode(HttpStatusCode::k400BadRequest);
-            (*callbackPtr)(response);
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
         });
 }
 
@@ -81,36 +80,41 @@ void CommentController::update(
     std::string &&id)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto editedComment = parseService::getCommentFromRequest(*req);
+    const auto editedComment = parseService::getCommentFromRequest(*req);
+
+    if (editedComment.getCommentId() == nullptr) {
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+    const auto criteria = Criteria(
+        drogon_model::blog::Comment::Cols::_comment_id,
+        CompareOperator::EQ,
+        editedComment.getValueOfCommentId());
 
     try {
         auto json = Json::Value();
-        auto comment= m_commentMapper.findByPrimaryKey(editedComment.getValueOfCommentId());
+
+        auto comments = m_commentMapper.limit(1).findBy(criteria);
+        if (comments.empty()) throw std::runtime_error("Did not find comment");
+
+        auto comment = comments[0];
         comment.setTextContent(editedComment.getValueOfTextContent());
         m_commentMapper.update(comment);
+
         json["comment"] = comment.toJson();
         auto resp = HttpResponse::newHttpJsonResponse(json);
         resp->setStatusCode(HttpStatusCode::k200OK);
         (*callbackPtr)(resp);
-
-    } catch (const std::exception &e) {
+    } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        (*callbackPtr)(resp);
-
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+    } catch (const DrogonDbException &e) {
+        LOG_ERROR << e.base().what();
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+    } catch (const std::runtime_error &e) {
+        LOG_ERROR << e.what();
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
-    // } catch (const UnexpectedRows &e) {
-    //     LOG_ERROR << e.what();
-    //     auto resp = HttpResponse::newHttpResponse();
-    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-    //     (*callbackPtr)(resp);
-
-    // } catch (const DrogonDbException &e) {
-    //     LOG_ERROR << e.base().what();
-    //     auto resp = HttpResponse::newHttpResponse();
-    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-    //     (*callbackPtr)(resp);
 }
 
 void CommentController::remove(
@@ -123,12 +127,10 @@ void CommentController::remove(
 
     try {
         m_commentMapper.deleteByPrimaryKey(commentId);
+        httpService::sendEmptyResponse(callbackPtr, k204NoContent);
 
     } catch (const std::exception &e) {
         LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        (*callbackPtr)(resp);
-
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }

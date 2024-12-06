@@ -1,6 +1,7 @@
 #include "PostController.h"
 #include "../utils/jwtservice.h"
 #include "../utils/parseservice.h"
+#include "../utils/httpservice.h"
 
 void PostController::create(
     const HttpRequestPtr &req,
@@ -38,7 +39,7 @@ void PostController::update(
     const auto editedPost = parseService::getPostFromRequest(*req);
 
     if (editedPost.getPostId() == nullptr) {
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
         return;
     }
     const auto criteria = Criteria(
@@ -62,13 +63,13 @@ void PostController::update(
         (*callbackPtr)(resp);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     } catch (const DrogonDbException &e) {
         LOG_ERROR << e.base().what();
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     } catch (const std::runtime_error &e) {
         LOG_ERROR << e.what();
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
 
@@ -96,13 +97,13 @@ void PostController::remove(
         m_likeMapper.deleteBy(likeCriteria);
         m_imageMapper.deleteBy(imageCriteria);
         m_postMapper.deleteByPrimaryKey(postId);
-        sendEmptyResponse(callbackPtr, k204NoContent);
+        httpService::sendEmptyResponse(callbackPtr, k204NoContent);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
 
     } catch (const std::exception &e) {
-        sendEmptyResponse(callbackPtr, k400BadRequest);
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
 
@@ -123,7 +124,7 @@ void PostController::get(
             authorUsername);
         const auto users = m_userMapper.findBy(userCriteria);
         if (users.empty()) {
-            sendEmptyResponse(callbackPtr, k400BadRequest);
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
             return;
         }
         const auto userId = users[0].getValueOfUserId();
@@ -165,12 +166,4 @@ void PostController::get(
     (*callbackPtr)(response);
 }
 
-void PostController::sendEmptyResponse(
-    const std::shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
-    const HttpStatusCode &code)
-{
-    auto resp = HttpResponse::newHttpResponse();
-    resp->setStatusCode(code);
-    (*callback)(resp);
-}
 

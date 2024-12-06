@@ -1,18 +1,18 @@
 /**
  *
- *  RightFilter.cc
+ *  PostRightFilter.cc
  *
  */
 
-#include "RightFilter.h"
+#include "PostRightFilter.h"
 #include "../utils/jwtservice.h"
 #include "../utils/parseservice.h"
 
-void RightFilter::doFilter(
+void PostRightFilter::doFilter(
     const HttpRequestPtr &req,
     FilterCallback &&fcb,
     FilterChainCallback &&fccb)
-{ // todo: comments right check
+{
     auto user = jwtService::getCurrentUserFromRequest(req);
     if (!user.has_value()) {
         auto res = drogon::HttpResponse::newHttpResponse();
@@ -21,16 +21,27 @@ void RightFilter::doFilter(
     }
 
     auto json = req->getJsonObject();
-    int postId = parseService::getPostIdFromRequest(*req);
 
-    auto post = postMapper.findByPrimaryKey(postId);
-
+    const int postId = parseService::getPostIdFromRequest(*req);
+    const auto posts = m_postMapper.findBy(
+        Criteria(
+            drogon_model::blog::Post::Cols::_post_id,
+            CompareOperator::EQ,
+            postId));
+    if (posts.empty()) {
+        auto res = drogon::HttpResponse::newHttpResponse();
+        res->setStatusCode(k400BadRequest);
+        fcb(res);
+    }
+    const auto post = posts[0];
     if (user->getValueOfIsAdmin() || post.getValueOfUserId() == user->getValueOfUserId()) {
         fccb();
         return;
     }
 
+
     auto res = drogon::HttpResponse::newHttpResponse();
     res->setStatusCode(k403Forbidden);
     fcb(res);
+
 }

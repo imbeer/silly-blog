@@ -40,11 +40,14 @@ set(PROJECT_SOURCES
     models/User.h
     filters/LoginFilter.cc
     filters/LoginFilter.h
-    filters/RightFilter.cc
-    filters/RightFilter.h
+    filters/PostRightFilter.cc
+    filters/PostRightFilter.h
+    filters/CommentRightFilter.h
+    filters/CommentRightFilter.cc
     utils/jwtservice.cc
     utils/jwtservice.h
     utils/parseservice.h
+    utils/httpservice.h
 )
 
 

@@ -1,6 +1,6 @@
 /**
  *
- *  RightFilter.h
+ *  PostRightFilter.h
  *
  */
 
@@ -14,17 +14,17 @@
 using namespace drogon;
 using namespace drogon::orm;
 
-class RightFilter : public HttpFilter<RightFilter>
+class PostRightFilter : public HttpFilter<PostRightFilter>
 {
 public:
-    RightFilter() {}
+    PostRightFilter() {}
     void doFilter(
         const HttpRequestPtr &req,
         FilterCallback &&fcb,
         FilterChainCallback &&fccb) override;
 
 private:
-    Mapper<drogon_model::blog::User> userMapper = Mapper<drogon_model::blog::User>(app().getDbClient());
-    Mapper<drogon_model::blog::Post> postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
+    Mapper<drogon_model::blog::User> m_userMapper = Mapper<drogon_model::blog::User>(app().getDbClient());
+    Mapper<drogon_model::blog::Post> m_postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
 };
 
