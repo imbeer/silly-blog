@@ -219,7 +219,7 @@ DROGON_TEST(LoginUserTest)
         });
 }
 
-DROGON_TEST(CommentTest)
+DROGON_TEST(GetCommentTest)
 {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
 
@@ -245,6 +245,125 @@ DROGON_TEST(CommentTest)
                 // cout << response->getBody() << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+}
+
+DROGON_TEST(NewCommentTest)
+{
+    // todo: fix creating + edit + delete
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+    string ownerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
+    string adminJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMTEifQ.a3R-w1k-ljSqVvsp8OkFWrfZOPV96etxnYvCyJ408n8";
+    string nonOwnerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDgifQ.BS8gjxz-_ujhRb5LER11Op0YVCM6ds8fgIC16pbPtuo";
+
+    Json::Value newCommentJson;
+    newCommentJson["comment"]["text_content"] = "This is a test comment.";
+    newCommentJson["comment"]["post_id"] = 100;
+
+    auto commentCreationRequest = HttpRequest::newHttpJsonRequest(newCommentJson);
+    commentCreationRequest->setMethod(Post);
+    commentCreationRequest->setPath("/post/comment");
+    commentCreationRequest->addHeader("Authorization", "Bearer " + ownerJwt);
+
+    int commentId = 0;
+
+    auto [result, response] = client->sendRequest(commentCreationRequest);
+    if (result == ReqResult::Ok && response) {
+        CHECK(response->getStatusCode() == k201Created);
+        commentId = (*response->getJsonObject())["comment"]["comment_id"].asInt();
+    } else {
+        cerr << "Not created, error is: " << (int)result << endl;
+        FAIL("Request failed");
+        return;
+    }
+
+    cout << "commentId: " << commentId << endl;
+
+    auto editCommentJson = Json::Value();
+    editCommentJson["comment"]["comment_id"] = commentId;
+    editCommentJson["comment"]["text_content"] = "edited text content";
+
+    auto commentEditFromOwnerRequest = HttpRequest::newHttpJsonRequest(editCommentJson);
+    commentEditFromOwnerRequest->setMethod(Put);
+    commentEditFromOwnerRequest->setPath("/post/comment");
+    commentEditFromOwnerRequest->addHeader("Authorization", "Bearer " + ownerJwt);
+
+    auto commentEditFromAdminRequest = HttpRequest::newHttpJsonRequest(editCommentJson);
+    commentEditFromAdminRequest->setMethod(Put);
+    commentEditFromAdminRequest->setPath("/post/comment");
+    commentEditFromAdminRequest->addHeader("Authorization", "Bearer " + adminJwt);
+
+    auto commentEditFromNonOwnerRequest = HttpRequest::newHttpJsonRequest(editCommentJson);
+    commentEditFromNonOwnerRequest->setMethod(Put);
+    commentEditFromNonOwnerRequest->setPath("/post/comment");
+    commentEditFromNonOwnerRequest->addHeader("Authorization", "Bearer " + nonOwnerJwt);
+
+    client->sendRequest(
+        commentEditFromOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k200OK);
+            } else {
+                cerr << "Not edited by owner, error is: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    client->sendRequest(
+        commentEditFromAdminRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k200OK);
+            } else {
+                cerr << "Not edited by admin, error is: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    client->sendRequest(
+        commentEditFromNonOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k403Forbidden);
+            } else {
+                cerr << "Something with non-owner: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    auto deleteCommentJson = Json::Value();
+    deleteCommentJson["comment"]["comment_id"] = commentId;
+
+    auto postDeleteFromOwnerRequest = HttpRequest::newHttpJsonRequest(deleteCommentJson);
+    postDeleteFromOwnerRequest->setMethod(Delete);
+    postDeleteFromOwnerRequest->setPath("/post/comment");
+    postDeleteFromOwnerRequest->addHeader("Authorization", "Bearer " + ownerJwt);
+
+    auto postDeleteFromNonOwnerRequest = HttpRequest::newHttpJsonRequest(deleteCommentJson);
+    postDeleteFromNonOwnerRequest->setMethod(Delete);
+    postDeleteFromNonOwnerRequest->setPath("/post/comment");
+    postDeleteFromNonOwnerRequest->addHeader("Authorization", "Bearer " + nonOwnerJwt);
+
+    client->sendRequest(
+        postDeleteFromNonOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k403Forbidden);
+            } else {
+                cerr << "Something with non-owner deletion: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    client->sendRequest(
+        postDeleteFromOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k204NoContent);
+            } else {
+                cerr << "Not deleted by owner: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
