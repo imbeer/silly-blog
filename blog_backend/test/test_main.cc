@@ -5,7 +5,8 @@
 using namespace drogon;
 using namespace std;
 
-//todo: Like test, comment test
+//todo: Like test,
+//todo: Comment test
 
 
 DROGON_TEST(GetPostsTest)
@@ -31,7 +32,7 @@ DROGON_TEST(GetPostsTest)
         [TEST_CTX, author, offset, limit](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k200OK);
-                cout << response->getBody() << endl;
+                // cout << response->getBody() << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;
                 FAIL("Request failed");
@@ -211,6 +212,37 @@ DROGON_TEST(LoginUserTest)
                 string loginJwt = (*json)["token"].asString();
                 CHECK((*json)["user"]["username"] == "cool_test_username_3");
                 cout << "jwt is: " << loginJwt << endl;
+            } else {
+                cerr << "Request failed with error: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+}
+
+DROGON_TEST(CommentTest)
+{
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+
+    string currentUser = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
+
+    const int offset = 0;
+    const int limit = 10;
+
+    const auto request = HttpRequest::newHttpRequest();
+    request->setPath("/post");
+    request->setMethod(drogon::Get);
+    request->setParameter("id", "1");
+    request->setParameter("author", "");
+    request->setParameter("offset", std::to_string(offset));
+    request->setParameter("limit", std::to_string(limit));
+    request->addHeader("Authorization", "Bearer " + currentUser);
+
+    client->sendRequest(
+        request,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k200OK);
+                // cout << response->getBody() << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;
                 FAIL("Request failed");

@@ -31,6 +31,8 @@ void CommentController::get(
             Criteria(drogon_model::blog::Post::Cols::_post_id, CompareOperator::EQ, postId));
         if (!posts.empty()) {
             postCriteria = Criteria(drogon_model::blog::Comment::Cols::_post_id, CompareOperator::EQ, postId);
+        } else {
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
         }
     }
 
