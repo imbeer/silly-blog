@@ -2,13 +2,14 @@
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 
+using namespace drogon;
+using namespace std;
+
 //todo: Like test, comment test
+
 
 DROGON_TEST(GetPostsTest)
 {
-    using namespace drogon;
-    using namespace std;
-
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
 
     const std::string author = "mcgeechristopher";
@@ -40,9 +41,6 @@ DROGON_TEST(GetPostsTest)
 
 DROGON_TEST(NewPostsTest)
 {
-    using namespace drogon;
-    using namespace std;
-
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
     string ownerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
     string adminJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMTEifQ.a3R-w1k-ljSqVvsp8OkFWrfZOPV96etxnYvCyJ408n8";
@@ -56,19 +54,20 @@ DROGON_TEST(NewPostsTest)
     postCreationRequest->setPath("/posts");
     postCreationRequest->addHeader("Authorization", "Bearer " + ownerJwt);
 
-    client->sendRequest(
-        postCreationRequest,
-        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
-            if (result == ReqResult::Ok && response) {
-                CHECK(response->getStatusCode() == k201Created);
-            } else {
-                cerr << "Not created, error is: " << (int)result << endl;
-                FAIL("Request failed");
-            }
-        });
+    int postId = 0;
+
+    auto [result, response] = client->sendRequest(postCreationRequest);
+    if (result == ReqResult::Ok && response) {
+        CHECK(response->getStatusCode() == k201Created);
+        postId = (*response->getJsonObject())["post"]["post_id"].asInt();
+    } else {
+        cerr << "Not created, error is: " << (int)result << endl;
+        FAIL("Request failed");
+        return;
+    }
 
     auto editPostJson = Json::Value();
-    editPostJson["post"]["post_id"] = 1050;
+    editPostJson["post"]["post_id"] = postId;
     editPostJson["post"]["text_content"] = "edited text content";
 
     auto postEditFromOwnerRequest = HttpRequest::newHttpJsonRequest(editPostJson);
@@ -120,7 +119,7 @@ DROGON_TEST(NewPostsTest)
         });
 
     auto deletePostJson = Json::Value();
-    deletePostJson["post"]["post_id"] = 1050;
+    deletePostJson["post"]["post_id"] = postId;
 
     auto postDeleteFromOwnerRequest = HttpRequest::newHttpJsonRequest(deletePostJson);
     postDeleteFromOwnerRequest->setMethod(Delete);
@@ -193,9 +192,6 @@ DROGON_TEST(NewPostsTest)
 
 DROGON_TEST(LoginUserTest)
 {
-    using namespace drogon;
-    using namespace std;
-
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
 
     Json::Value userData;
@@ -205,7 +201,6 @@ DROGON_TEST(LoginUserTest)
     auto userRegistrationRequest = HttpRequest::newHttpJsonRequest(userData);
     userRegistrationRequest->setMethod(Post);
     userRegistrationRequest->setPath("/users/login");
-
 
     client->sendRequest(
         userRegistrationRequest,
