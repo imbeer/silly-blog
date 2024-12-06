@@ -8,7 +8,7 @@ void PostController::create(
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     auto newPost = parseService::getPostFromRequest(*req);
-    auto userId = jwtService::getCurrentUserIdFromRequest(req);
+    const auto userId = jwtService::getCurrentUserIdFromRequest(req);
 
     newPost.setUserId(userId.value());
     newPost.setTime(::trantor::Date::now());
@@ -33,24 +33,32 @@ void PostController::create(
 void PostController::update(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
-{ // todo: add check if request does not have post id.
+{
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    auto editedPost = parseService::getPostFromRequest(*req);
+    const auto editedPost = parseService::getPostFromRequest(*req);
 
     if (editedPost.getPostId() == nullptr) {
         sendEmptyResponse(callbackPtr, k400BadRequest);
         return;
     }
+    const auto criteria = Criteria(
+        drogon_model::blog::Post::Cols::_post_id,
+        CompareOperator::EQ,
+        editedPost.getValueOfPostId());
 
     try {
         auto json = Json::Value();
-        auto post = m_postMapper.findByPrimaryKey(editedPost.getValueOfPostId());
+
+        auto posts = m_postMapper.limit(1).findBy(criteria);
+        if (posts.empty()) throw std::runtime_error("Did not find post");
+
+        auto post = posts[0];
         post.setTextContent(editedPost.getValueOfTextContent());
         m_postMapper.update(post);
+
         json["post"] = post.toJson();
         auto resp = HttpResponse::newHttpJsonResponse(json);
         resp->setStatusCode(HttpStatusCode::k200OK);
-        cout << "updated" << endl;
         (*callbackPtr)(resp);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
@@ -58,7 +66,7 @@ void PostController::update(
     } catch (const DrogonDbException &e) {
         LOG_ERROR << e.base().what();
         sendEmptyResponse(callbackPtr, k400BadRequest);
-    } catch (const std::exception &e) {
+    } catch (const std::runtime_error &e) {
         LOG_ERROR << e.what();
         sendEmptyResponse(callbackPtr, k400BadRequest);
     }
@@ -72,15 +80,15 @@ void PostController::remove(
     const int postId = parseService::getPostIdFromRequest(*req);
 
     try {
-        auto commentCriteria = Criteria(
+        const auto commentCriteria = Criteria(
             drogon_model::blog::Comment::Cols::_post_id,
             CompareOperator::EQ,
             postId);
-        auto likeCriteria = Criteria(
+        const auto likeCriteria = Criteria(
             drogon_model::blog::Like::Cols::_post_id,
             CompareOperator::EQ,
             postId);
-        auto imageCriteria = Criteria(
+        const auto imageCriteria = Criteria(
             drogon_model::blog::Image::Cols::_post_id,
             CompareOperator::EQ,
             postId);
@@ -88,7 +96,7 @@ void PostController::remove(
         m_likeMapper.deleteBy(likeCriteria);
         m_imageMapper.deleteBy(imageCriteria);
         m_postMapper.deleteByPrimaryKey(postId);
-       sendEmptyResponse(callbackPtr, k204NoContent);
+        sendEmptyResponse(callbackPtr, k204NoContent);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
         sendEmptyResponse(callbackPtr, k400BadRequest);
@@ -106,34 +114,39 @@ void PostController::get(
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     Json::Value responseBody;
-    responseBody.resize(0);
     Criteria postCriteria;
 
     if (!authorUsername.empty()) {
-        const Criteria userCriteria(drogon_model::blog::User::Cols::_username, CompareOperator::EQ, authorUsername);
+        const Criteria userCriteria(
+            drogon_model::blog::User::Cols::_username,
+            CompareOperator::EQ,
+            authorUsername);
         const auto users = m_userMapper.findBy(userCriteria);
         if (users.empty()) {
             sendEmptyResponse(callbackPtr, k400BadRequest);
             return;
         }
         const auto userId = users[0].getValueOfUserId();
-        postCriteria = Criteria(drogon_model::blog::Post::Cols::_user_id, CompareOperator::EQ, userId);
+        postCriteria = Criteria(
+            drogon_model::blog::Post::Cols::_user_id,
+            CompareOperator::EQ,
+            userId);
     }
 
     const auto posts = m_postMapper
-                           .orderBy(drogon_model::blog::Post::Cols::_time)
-                           .limit(limit)
-                           .offset(offset)
-                           .findBy(postCriteria);
+        .orderBy(drogon_model::blog::Post::Cols::_time)
+        .limit(limit)
+        .offset(offset)
+        .findBy(postCriteria);
 
     const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
-    cout << currentUserId;
     const auto likeUserCriteria = Criteria(
         drogon_model::blog::Like::Cols::_user_id,
         CompareOperator::EQ,
         currentUserId);
 
-    for (const auto &post : posts) {
+    for (const auto &post : posts)
+    {
         auto postJson = post.toJson();
         const auto likePostCriteria = Criteria(
                 drogon_model::blog::Like::Cols::_post_id,

@@ -12,7 +12,7 @@ void RightFilter::doFilter(
     const HttpRequestPtr &req,
     FilterCallback &&fcb,
     FilterChainCallback &&fccb)
-{
+{ // todo: comments right check
     auto user = jwtService::getCurrentUserFromRequest(req);
     if (!user.has_value()) {
         auto res = drogon::HttpResponse::newHttpResponse();
