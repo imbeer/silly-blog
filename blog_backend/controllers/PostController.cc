@@ -37,6 +37,11 @@ void PostController::update(
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     auto editedPost = parseService::getPostFromRequest(*req);
 
+    if (editedPost.getPostId() == nullptr) {
+        sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+
     try {
         auto json = Json::Value();
         auto post = m_postMapper.findByPrimaryKey(editedPost.getValueOfPostId());
@@ -49,22 +54,13 @@ void PostController::update(
         (*callbackPtr)(resp);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "unexpected rows" << endl;
-        (*callbackPtr)(resp);
+        sendEmptyResponse(callbackPtr, k400BadRequest);
     } catch (const DrogonDbException &e) {
         LOG_ERROR << e.base().what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "not found" << endl;
-        (*callbackPtr)(resp);
+        sendEmptyResponse(callbackPtr, k400BadRequest);
     } catch (const std::exception &e) {
         LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "not found" << endl;
-        (*callbackPtr)(resp);
+        sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
 
@@ -92,20 +88,13 @@ void PostController::remove(
         m_likeMapper.deleteBy(likeCriteria);
         m_imageMapper.deleteBy(imageCriteria);
         m_postMapper.deleteByPrimaryKey(postId);
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k204NoContent);
-        (*callbackPtr)(resp);
+       sendEmptyResponse(callbackPtr, k204NoContent);
     } catch (const UnexpectedRows &e) {
         LOG_ERROR << e.what();
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        cout << "unexpected rows" << endl;
-        (*callbackPtr)(resp);
+        sendEmptyResponse(callbackPtr, k400BadRequest);
 
     } catch (const std::exception &e) {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(HttpStatusCode::k400BadRequest);
-        (*callbackPtr)(resp);
+        sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
 
@@ -124,9 +113,7 @@ void PostController::get(
         const Criteria userCriteria(drogon_model::blog::User::Cols::_username, CompareOperator::EQ, authorUsername);
         const auto users = m_userMapper.findBy(userCriteria);
         if (users.empty()) {
-            auto response = HttpResponse::newHttpResponse();
-            response->setStatusCode(HttpStatusCode::k400BadRequest);
-            (*callbackPtr)(response);
+            sendEmptyResponse(callbackPtr, k400BadRequest);
             return;
         }
         const auto userId = users[0].getValueOfUserId();
@@ -165,4 +152,12 @@ void PostController::get(
     (*callbackPtr)(response);
 }
 
+void PostController::sendEmptyResponse(
+    const std::shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
+    const HttpStatusCode &code)
+{
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setStatusCode(code);
+    (*callback)(resp);
+}
 

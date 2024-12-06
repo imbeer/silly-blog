@@ -33,6 +33,9 @@ public:
         std::function<void (const HttpResponsePtr &)> &&callback,
         const string &author,
         const int offset, const int limit);
+    void sendEmptyResponse(
+        const std::shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
+        const HttpStatusCode &code);
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
