@@ -10,7 +10,7 @@ void PostController::create(
     auto newPost = parseService::getPostFromRequest(*req);
     auto userId = jwtService::getCurrentUserIdFromRequest(req);
 
-    newPost.setPostId(userId.value());
+    newPost.setUserId(userId.value());
     newPost.setTime(::trantor::Date::now());
 
     m_postMapper.insert(
@@ -33,7 +33,7 @@ void PostController::create(
 void PostController::update(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
-{
+{ // todo: add check if request does not have post id.
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     auto editedPost = parseService::getPostFromRequest(*req);
 
@@ -47,28 +47,25 @@ void PostController::update(
         resp->setStatusCode(HttpStatusCode::k200OK);
         cout << "updated" << endl;
         (*callbackPtr)(resp);
-
+    } catch (const UnexpectedRows &e) {
+        LOG_ERROR << e.what();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        cout << "unexpected rows" << endl;
+        (*callbackPtr)(resp);
+    } catch (const DrogonDbException &e) {
+        LOG_ERROR << e.base().what();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        cout << "not found" << endl;
+        (*callbackPtr)(resp);
     } catch (const std::exception &e) {
         LOG_ERROR << e.what();
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(HttpStatusCode::k400BadRequest);
         cout << "not found" << endl;
         (*callbackPtr)(resp);
-
     }
-    // } catch (const UnexpectedRows &e) {
-    //     LOG_ERROR << e.what();
-    //     auto resp = HttpResponse::newHttpResponse();
-    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-    //     cout << "unexpected rows" << endl;
-    //     (*callbackPtr)(resp);
-
-    // } catch (const DrogonDbException &e) {
-    //     LOG_ERROR << e.base().what();
-    //     auto resp = HttpResponse::newHttpResponse();
-    //     resp->setStatusCode(HttpStatusCode::k400BadRequest);
-    //     cout << "not found" << endl;
-    //     (*callbackPtr)(resp);
 }
 
 void PostController::remove(
@@ -98,6 +95,13 @@ void PostController::remove(
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(HttpStatusCode::k204NoContent);
         (*callbackPtr)(resp);
+    } catch (const UnexpectedRows &e) {
+        LOG_ERROR << e.what();
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(HttpStatusCode::k400BadRequest);
+        cout << "unexpected rows" << endl;
+        (*callbackPtr)(resp);
+
     } catch (const std::exception &e) {
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(HttpStatusCode::k400BadRequest);
@@ -136,6 +140,7 @@ void PostController::get(
                            .findBy(postCriteria);
 
     const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
+    cout << currentUserId;
     const auto likeUserCriteria = Criteria(
         drogon_model::blog::Like::Cols::_user_id,
         CompareOperator::EQ,

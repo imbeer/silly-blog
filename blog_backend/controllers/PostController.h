@@ -16,7 +16,7 @@ public:
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
         ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "RightFilter");
         ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "RightFilter");
-        ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get, "LoginFilter"); // todo: fix test to login filter
+        ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get, "LoginFilter");
     METHOD_LIST_END
 
     void create(

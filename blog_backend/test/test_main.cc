@@ -2,31 +2,35 @@
 #include <drogon/drogon_test.h>
 #include <drogon/drogon.h>
 
+//todo: Like test, comment test
+
 DROGON_TEST(GetPostsTest)
 {
     using namespace drogon;
     using namespace std;
 
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+
     const std::string author = "mcgeechristopher";
+    string currentUser = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
+
     const int offset = 0;
     const int limit = 20;
+
     const auto request = HttpRequest::newHttpRequest();
     request->setPath("/posts");
+    request->setMethod(drogon::Get);
     request->setParameter("author", author);
     request->setParameter("offset", std::to_string(offset));
     request->setParameter("limit", std::to_string(limit));
+    request->addHeader("Authorization", "Bearer " + currentUser);
 
     client->sendRequest(
         request,
         [TEST_CTX, author, offset, limit](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
-                // cout << "Request URL: /posts?author=" << author
-                //      << "&offset=" << offset << "&limit=" << limit << endl;
-                // cout << "Status Code: " << response->getStatusCode() << endl;
-                // cout << "Response Body: " << response->getBody() << endl;
-
                 CHECK(response->getStatusCode() == k200OK);
+                cout << response->getBody() << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;
                 FAIL("Request failed");
@@ -44,11 +48,10 @@ DROGON_TEST(NewPostsTest)
     string adminJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMTEifQ.a3R-w1k-ljSqVvsp8OkFWrfZOPV96etxnYvCyJ408n8";
     string nonOwnerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDgifQ.BS8gjxz-_ujhRb5LER11Op0YVCM6ds8fgIC16pbPtuo";
 
-    Json::Value postData;
-    postData["post"]["user_id"] = 206;
-    postData["post"]["text_content"] = "This is a test post.";
+    Json::Value newPostJson;
+    newPostJson["post"]["text_content"] = "This is a test post.";
 
-    auto postCreationRequest = HttpRequest::newHttpJsonRequest(postData);
+    auto postCreationRequest = HttpRequest::newHttpJsonRequest(newPostJson);
     postCreationRequest->setMethod(Post);
     postCreationRequest->setPath("/posts");
     postCreationRequest->addHeader("Authorization", "Bearer " + ownerJwt);
@@ -59,26 +62,26 @@ DROGON_TEST(NewPostsTest)
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k201Created);
             } else {
-                cerr << "Request failed with error: " << (int)result << endl;
+                cerr << "Not created, error is: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
 
-    auto newPostJson = Json::Value();
-    newPostJson["post"]["post_id"] = 1020;
-    newPostJson["post"]["text_content"] = "edited text content";
+    auto editPostJson = Json::Value();
+    editPostJson["post"]["post_id"] = 1050;
+    editPostJson["post"]["text_content"] = "edited text content";
 
-    auto postEditFromOwnerRequest = HttpRequest::newHttpJsonRequest(newPostJson);
+    auto postEditFromOwnerRequest = HttpRequest::newHttpJsonRequest(editPostJson);
     postEditFromOwnerRequest->setMethod(Put);
     postEditFromOwnerRequest->setPath("/posts");
     postEditFromOwnerRequest->addHeader("Authorization", "Bearer " + ownerJwt);
 
-    auto postEditFromAdminRequest = HttpRequest::newHttpJsonRequest(newPostJson);
+    auto postEditFromAdminRequest = HttpRequest::newHttpJsonRequest(editPostJson);
     postEditFromAdminRequest->setMethod(Put);
     postEditFromAdminRequest->setPath("/posts");
     postEditFromAdminRequest->addHeader("Authorization", "Bearer " + adminJwt);
 
-    auto postEditFromNonOwnerRequest = HttpRequest::newHttpJsonRequest(newPostJson);
+    auto postEditFromNonOwnerRequest = HttpRequest::newHttpJsonRequest(editPostJson);
     postEditFromNonOwnerRequest->setMethod(Put);
     postEditFromNonOwnerRequest->setPath("/posts");
     postEditFromNonOwnerRequest->addHeader("Authorization", "Bearer " + nonOwnerJwt);
@@ -89,7 +92,7 @@ DROGON_TEST(NewPostsTest)
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k200OK);
             } else {
-                cerr << "Request failed with error: " << (int)result << endl;
+                cerr << "Not edited by owner, error is: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
@@ -100,7 +103,7 @@ DROGON_TEST(NewPostsTest)
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k200OK);
             } else {
-                cerr << "Request failed with error: " << (int)result << endl;
+                cerr << "Not edited by admin, error is: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
@@ -111,7 +114,47 @@ DROGON_TEST(NewPostsTest)
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k403Forbidden);
             } else {
-                cerr << "Request failed with error: " << (int)result << endl;
+                cerr << "Something with non-owner: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    auto deletePostJson = Json::Value();
+    deletePostJson["post"]["post_id"] = 1050;
+
+    auto postDeleteFromOwnerRequest = HttpRequest::newHttpJsonRequest(deletePostJson);
+    postDeleteFromOwnerRequest->setMethod(Delete);
+    postDeleteFromOwnerRequest->setPath("/posts");
+    postDeleteFromOwnerRequest->addHeader("Authorization", "Bearer " + ownerJwt);
+
+    auto postDeleteFromAdminRequest = HttpRequest::newHttpJsonRequest(deletePostJson);
+    postDeleteFromAdminRequest->setMethod(Delete);
+    postDeleteFromAdminRequest->setPath("/posts");
+    postDeleteFromAdminRequest->addHeader("Authorization", "Bearer " + adminJwt);
+
+    auto postDeleteFromNonOwnerRequest = HttpRequest::newHttpJsonRequest(deletePostJson);
+    postDeleteFromNonOwnerRequest->setMethod(Delete);
+    postDeleteFromNonOwnerRequest->setPath("/posts");
+    postDeleteFromNonOwnerRequest->addHeader("Authorization", "Bearer " + nonOwnerJwt);
+
+    client->sendRequest(
+        postDeleteFromNonOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k403Forbidden);
+            } else {
+                cerr << "Something with non-owner deletion: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    client->sendRequest(
+        postDeleteFromOwnerRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k204NoContent);
+            } else {
+                cerr << "Not deleted by owner: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
@@ -163,15 +206,16 @@ DROGON_TEST(LoginUserTest)
     userRegistrationRequest->setMethod(Post);
     userRegistrationRequest->setPath("/users/login");
 
+
     client->sendRequest(
         userRegistrationRequest,
         [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
             if (result == ReqResult::Ok && response) {
                 CHECK(response->getStatusCode() == k200OK);
                 auto json = response->getJsonObject();
-                string jsonWebToken = (*json)["token"].asString();
+                string loginJwt = (*json)["token"].asString();
                 CHECK((*json)["user"]["username"] == "cool_test_username_3");
-                cout << "jwt is: " << jsonWebToken << endl;
+                cout << "jwt is: " << loginJwt << endl;
             } else {
                 cerr << "Request failed with error: " << (int)result << endl;
                 FAIL("Request failed");
