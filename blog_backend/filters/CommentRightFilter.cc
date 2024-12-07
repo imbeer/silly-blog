@@ -25,7 +25,7 @@ void CommentRightFilter::doFilter(
     const int commentId = parseService::getCommentIdFromRequest(*req);
     const auto comments = m_commentMapper.findBy(
         Criteria(
-            drogon_model::blog::Comment::Cols::_post_id,
+            drogon_model::blog::Comment::Cols::_comment_id,
             CompareOperator::EQ,
             commentId));
     if (comments.empty()) {
