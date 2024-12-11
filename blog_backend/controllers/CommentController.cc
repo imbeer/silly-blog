@@ -8,7 +8,7 @@ void CommentController::get(
     const HttpRequestPtr &req,
     std::function<void(const HttpResponsePtr &)> &&callback,
     const int postId,
-    const string author,
+    const string &author,
     const int offset, const int limit)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
@@ -78,8 +78,7 @@ void CommentController::create(
 
 void CommentController::update(
     const HttpRequestPtr &req,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    std::string &&id)
+    std::function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     const auto editedComment = parseService::getCommentFromRequest(*req);
@@ -121,8 +120,7 @@ void CommentController::update(
 
 void CommentController::remove(
     const HttpRequestPtr &req,
-    std::function<void(const HttpResponsePtr &)> &&callback,
-    std::string &&id)
+    std::function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     const int commentId = parseService::getCommentIdFromRequest(*req);

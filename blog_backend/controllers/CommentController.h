@@ -22,20 +22,18 @@ public:
     void get(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback,
-        const int postId,
-        const string author,
+        const int id,
+        const string &author,
         const int offset, const int limit);
     void create(
         const HttpRequestPtr &req,
         std::function<void(const HttpResponsePtr &)> &&callback);
     void update(
         const HttpRequestPtr &req,
-        std::function<void(const HttpResponsePtr &)> &&callback,
-        std::string &&id);
+        std::function<void(const HttpResponsePtr &)> &&callback);
     void remove(
         const HttpRequestPtr &req,
-        std::function<void(const HttpResponsePtr &)> &&callback,
-        std::string &&id);
+        std::function<void(const HttpResponsePtr &)> &&callback);
 
 private:
     drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
