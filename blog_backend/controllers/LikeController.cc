@@ -1,29 +1,28 @@
 #include "LikeController.h"
-#include <string>
 
 #include "../utils/jwtservice.h"
 #include "../utils/parseservice.h"
+#include "../utils/httpservice.h"
 
 void LikeController::getOne(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback,
-    const int &id)
+    const int &postId)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     const int userId = jwtService::getCurrentUserIdFromRequest(req).value();
-    const int &postId = id;
 
     int likeCount = 0;
     bool likedByCurrentUser = false;
+    const auto postCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_post_id,
+        CompareOperator::EQ,
+        postId);
+    const auto userCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_user_id,
+        CompareOperator::EQ,
+        userId);
     try {
-        const auto postCriteria = Criteria(
-            drogon_model::blog::Like::Cols::_post_id,
-            CompareOperator::EQ,
-            postId);
-        const auto userCriteria = Criteria(
-            drogon_model::blog::Like::Cols::_user_id,
-            CompareOperator::EQ,
-            userId);
         likeCount = m_likeMapper.count(postCriteria);
         likedByCurrentUser = m_likeMapper.count(postCriteria && userCriteria) == 1;
         Json::Value json;
@@ -33,6 +32,7 @@ void LikeController::getOne(
         auto response = HttpResponse::newHttpJsonResponse(json);
         response->setStatusCode(HttpStatusCode::k200OK);
         (*callbackPtr)(response);
+
     } catch (const std::exception &e) {
         auto response = HttpResponse::newHttpResponse();
         response->setStatusCode(HttpStatusCode::k400BadRequest);
@@ -49,18 +49,33 @@ void LikeController::like(
     const int userId = jwtService::getCurrentUserIdFromRequest(req).value();
     const int postId = parseService::getPostIdFromRequest(*req);
 
+    const auto postCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_post_id,
+        CompareOperator::EQ,
+        postId);
+    const auto userCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_user_id,
+        CompareOperator::EQ,
+        userId);
+
     try {
         m_postMapper.findByPrimaryKey(postId);
-    } catch (const std::exception &e) {
+    } catch (const drogon::orm::DrogonDbException &e) {
         auto response = HttpResponse::newHttpResponse();
         response->setStatusCode(HttpStatusCode::k400BadRequest);
         (*callbackPtr)(response);
+        return;
+    }
+
+    if (m_likeMapper.count(postCriteria && userCriteria) > 0) {
+        httpService::sendEmptyResponse(callbackPtr, k409Conflict);
+        return;
     }
 
     try {
         auto like = drogon_model::blog::Like();
         like.setPostId(postId);
-        like.setPostId(userId);
+        like.setUserId(userId);
         m_likeMapper.insert(like);
 
         auto resp = HttpResponse::newHttpJsonResponse(Json::Value("liked"));
@@ -68,16 +83,7 @@ void LikeController::like(
         (*callbackPtr)(resp);
 
     } catch (const drogon::orm::DrogonDbException &e) {
-        auto errorMessage = std::string(e.base().what());
-        if (errorMessage.find("duplicate key") != std::string::npos) {
-            auto resp = HttpResponse::newHttpJsonResponse(Json::Value("Already liked"));
-            resp->setStatusCode(k409Conflict);
-            (*callbackPtr)(resp);
-        } else {
-            auto resp = HttpResponse::newHttpJsonResponse(Json::Value("Database error"));
-            resp->setStatusCode(k500InternalServerError);
-            (*callbackPtr)(resp);
-        }
+        httpService::sendEmptyResponse(callbackPtr, k500InternalServerError);
     }
 }
 
@@ -89,11 +95,24 @@ void LikeController::dislike(
     const int userId = jwtService::getCurrentUserIdFromRequest(req).value();
     const int postId = parseService::getPostIdFromRequest(*req);
 
+    const auto postCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_post_id,
+        CompareOperator::EQ,
+        postId);
+    const auto userCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_user_id,
+        CompareOperator::EQ,
+        userId);
+
+    if (m_likeMapper.count(postCriteria && userCriteria) == 0) {
+        httpService::sendEmptyResponse(callbackPtr, k409Conflict);
+        return;
+    }
+
     try {
-        m_likeMapper.deleteByPrimaryKey(tuple<int, int>(userId, postId));
+        m_likeMapper.deleteBy(postCriteria && userCriteria);
+        httpService::sendEmptyResponse(callbackPtr, k204NoContent);
     } catch (const drogon::orm::DrogonDbException &e) {
-        auto resp = HttpResponse::newHttpJsonResponse(Json::Value("Already liked"));
-        resp->setStatusCode(drogon::k400BadRequest);
-        (*callbackPtr)(resp);
+        httpService::sendEmptyResponse(callbackPtr, k500InternalServerError);
     }
 }

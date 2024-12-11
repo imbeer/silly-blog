@@ -14,15 +14,15 @@ class LikeController: public HttpController<LikeController>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(LikeController::getOne, "/post/like?id={}", drogon::Get, "LoginFilter");
-        ADD_METHOD_TO(LikeController::like, "/post/like", drogon::Post, "LoginFilter");
+        ADD_METHOD_TO(LikeController::getOne, "/post/like?post_id={}", drogon::Get, "LoginFilter");
+        ADD_METHOD_TO(LikeController::like, "/post/like", drogon::Put, "LoginFilter");
         ADD_METHOD_TO(LikeController::dislike, "/post/like", drogon::Delete, "LoginFilter");
     METHOD_LIST_END
 
     void getOne(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback,
-        const int &id);
+        const int &postId);
     void like(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);

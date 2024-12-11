@@ -6,7 +6,6 @@ using namespace drogon;
 using namespace std;
 
 //todo: Like test,
-//todo: Comment test
 
 
 DROGON_TEST(GetPostsTest)
@@ -364,6 +363,86 @@ DROGON_TEST(NewCommentTest)
                 CHECK(response->getStatusCode() == k204NoContent);
             } else {
                 cerr << "Not deleted by owner: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+}
+
+DROGON_TEST(Like)
+{
+    auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
+    const string userJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
+    const int postId = 1;
+
+    auto getRequest = HttpRequest::newHttpRequest();
+    getRequest->setPath("/post/like");
+    getRequest->setMethod(drogon::Get);
+    getRequest->setParameter("post_id", std::to_string(postId));
+    getRequest->addHeader("Authorization", "Bearer " + userJwt);
+
+    client->sendRequest(
+        getRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k200OK);
+            } else {
+                cerr << "Cannot get likes: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    auto json = Json::Value();
+    json["post"]["post_id"] = postId;
+    auto likeRequest = HttpRequest::newHttpJsonRequest(json);
+    likeRequest->setPath("/post/like");
+    likeRequest->setMethod(drogon::Put);
+    likeRequest->addHeader("Authorization", "Bearer " + userJwt);
+
+    client->sendRequest(
+        likeRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k201Created);
+            } else {
+                cerr << "Cannot like: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    client->sendRequest(
+        likeRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k409Conflict);
+            } else {
+                cerr << "Cannot like again: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+
+    auto deleteRequest = HttpRequest::newHttpJsonRequest(json);
+    deleteRequest->setPath("/post/like");
+    deleteRequest->setMethod(drogon::Delete);
+    deleteRequest->addHeader("Authorization", "Bearer " + userJwt);
+
+    // todo: why does it so?
+    client->sendRequest(
+        deleteRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k204NoContent);
+            } else {
+                cerr << "Cannot unlike: " << (int)result << endl;
+                FAIL("Request failed");
+            }
+        });
+    client->sendRequest(
+        deleteRequest,
+        [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
+            if (result == ReqResult::Ok && response) {
+                CHECK(response->getStatusCode() == k409Conflict);
+            } else {
+                cerr << "Cannot unlike again: " << (int)result << endl;
                 FAIL("Request failed");
             }
         });
