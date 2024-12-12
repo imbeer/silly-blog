@@ -9,6 +9,7 @@ using namespace drogon;
 
 namespace parseService
 {
+
 inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
     return drogon_model::blog::Post((*req.getJsonObject())["post"]);
 }
@@ -32,4 +33,5 @@ inline int getCommentIdFromRequest(const HttpRequest &req) {
 inline int getUserIdFromRequest(const HttpRequest &req) {
     return (*req.getJsonObject())["user"]["user_id"].asInt();
 }
+
 };

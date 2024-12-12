@@ -28,6 +28,8 @@ set(PROJECT_SOURCES
     controllers/CommentController.h
     controllers/LikeController.cc
     controllers/LikeController.h
+    controllers/ImageController.cc
+    controllers/ImageController.h
     models/Comment.cc
     models/Comment.h
     models/Image.cc
@@ -47,11 +49,13 @@ set(PROJECT_SOURCES
     utils/jwtservice.cc
     utils/jwtservice.h
     utils/parseservice.h
+    utils/httpservice.cc
     utils/httpservice.h
 )
 
 
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES})
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES}
+)
 
 # ##############################################################################
 # If you include the drogon source code locally in your project, use this method
