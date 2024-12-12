@@ -10,7 +10,7 @@ using namespace drogon;
 using namespace drogon::orm;
 using namespace std;
 
-class LikeController: public HttpController<LikeController>
+class LikeController : public HttpController<LikeController>
 {
 public:
     METHOD_LIST_BEGIN
@@ -31,7 +31,7 @@ public:
         function<void(const HttpResponsePtr &)> &&callback);
 
 private:
-    drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
-    drogon::orm::Mapper<drogon_model::blog::User> m_userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
-    drogon::orm::Mapper<drogon_model::blog::Like> m_likeMapper = drogon::orm::Mapper<drogon_model::blog::Like>(app().getDbClient());
+    Mapper<drogon_model::blog::Post> m_postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
+    Mapper<drogon_model::blog::User> m_userMapper = Mapper<drogon_model::blog::User>(app().getDbClient());
+    Mapper<drogon_model::blog::Like> m_likeMapper = Mapper<drogon_model::blog::Like>(app().getDbClient());
 };

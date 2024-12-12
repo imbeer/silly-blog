@@ -36,8 +36,8 @@ public:
         std::function<void(const HttpResponsePtr &)> &&callback);
 
 private:
-    drogon::orm::Mapper<drogon_model::blog::Post> m_postMapper = drogon::orm::Mapper<drogon_model::blog::Post>(app().getDbClient());
-    drogon::orm::Mapper<drogon_model::blog::User> m_userMapper = drogon::orm::Mapper<drogon_model::blog::User>(app().getDbClient());
-    drogon::orm::Mapper<drogon_model::blog::Comment> m_commentMapper = drogon::orm::Mapper<drogon_model::blog::Comment>(app().getDbClient());
+    Mapper<drogon_model::blog::Post> m_postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
+    Mapper<drogon_model::blog::User> m_userMapper = Mapper<drogon_model::blog::User>(app().getDbClient());
+    Mapper<drogon_model::blog::Comment> m_commentMapper = Mapper<drogon_model::blog::Comment>(app().getDbClient());
 
 };
