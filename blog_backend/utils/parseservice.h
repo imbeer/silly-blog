@@ -10,6 +10,8 @@ using namespace drogon;
 namespace parseService
 {
 
+// todo: add optionals when there is no such thing.
+
 inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
     return drogon_model::blog::Post((*req.getJsonObject())["post"]);
 }
@@ -32,6 +34,10 @@ inline int getCommentIdFromRequest(const HttpRequest &req) {
 
 inline int getUserIdFromRequest(const HttpRequest &req) {
     return (*req.getJsonObject())["user"]["user_id"].asInt();
+}
+
+inline int getImageIdFromRequest(const HttpRequest &req) {
+    return (*req.getJsonObject())["image"]["image_id"].asInt();
 }
 
 };

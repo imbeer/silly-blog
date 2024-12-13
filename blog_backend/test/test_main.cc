@@ -5,9 +5,6 @@
 using namespace drogon;
 using namespace std;
 
-//todo: Like test,
-
-
 DROGON_TEST(GetPostsTest)
 {
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
@@ -425,7 +422,6 @@ DROGON_TEST(Like)
     deleteRequest->setMethod(drogon::Delete);
     deleteRequest->addHeader("Authorization", "Bearer " + userJwt);
 
-    // todo: why does it so?
     client->sendRequest(
         deleteRequest,
         [TEST_CTX](ReqResult result, const HttpResponsePtr &response) {
