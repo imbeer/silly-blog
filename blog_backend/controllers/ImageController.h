@@ -14,7 +14,7 @@ class ImageController : public HttpController<ImageController>
 public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(ImageController::get, "/image/download?id={}", drogon::Get);
-        ADD_METHOD_TO(ImageController::upload, "/image/upload", drogon::Post, "LoginFilter");
+        ADD_METHOD_TO(ImageController::upload, "/image/upload", drogon::Post/*, "LoginFilter"*/);
         ADD_METHOD_TO(ImageController::remove, "/image/delete", drogon::Delete, "LoginFilter");
     METHOD_LIST_END
 

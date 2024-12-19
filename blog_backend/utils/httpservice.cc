@@ -4,54 +4,53 @@
 namespace httpService
 {
 
-optional<string> saveImageFromReq(
-    const shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
-    const HttpRequest &req)
+optional<string> saveImageFromReq(const HttpRequestPtr &req)
 {
     MultiPartParser fileUpload;
 
     if (fileUpload.parse(req) != 0 || fileUpload.getFiles().size() != 1)
     {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setBody("Must only be one file");
-        resp->setStatusCode(k400BadRequest);
-        (*callback)(resp);
         return nullopt;
     }
 
     auto &file = fileUpload.getFiles()[0];
-    auto md5 = file.getMd5();
-    auto resp = HttpResponse::newHttpResponse();
-    resp->setBody("The server has calculated the file's MD5 hash to be " + md5);
-
-    string filename = httpService::generateUniqueFileName();
+    // auto md5 = file.getMd5();
+    string filename = httpService::generateUUID();
 
     try {
         file.saveAs(filename);
-        resp->setStatusCode(drogon::k201Created);
     } catch (const exception &e) {
-        resp->setStatusCode(drogon::k500InternalServerError);
+        return nullopt;
     }
 
-    (*callback)(resp);
     return optional<string>(filename);
 }
 
-string generateUniqueFileName()
+string generateUUID()
 {
-    const auto now = chrono::system_clock::now();
-    const auto time = chrono::system_clock::to_time_t(now);
-    std::stringstream stringStream;
-    stringStream << std::put_time(localtime(&time), "%Y%m%d%H%M%S");
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<uint32_t> dist(0, 0xFFFFFFFF);
 
-    random_device randomDevice;
-    uniform_int_distribution<int> dist(0, 15);
-    stringStream << "_";
-    for (int i = 0; i < 8; ++i) {
-        stringStream << hex << dist(randomDevice);
+    uint32_t data[4];
+    for (auto& d : data) {
+        d = dist(gen);
     }
 
-    return stringStream.str();
+    // Convert to UUID version 4 format
+    data[1] = (data[1] & 0xFFFF0FFF) | 0x00004000; // Version 4 (0100)
+    data[2] = (data[2] & 0x3FFFFFFF) | 0x80000000; // Variant 1 (10xx)
+
+    std::stringstream uuid;
+    uuid << std::hex << std::setfill('0') << std::nouppercase;
+
+    uuid << std::setw(8) << data[0] << "-"
+         << std::setw(4) << ((data[1] >> 16) & 0xFFFF) << "-"
+         << std::setw(4) << (data[1] & 0xFFFF) << "-"
+         << std::setw(4) << ((data[2] >> 16) & 0xFFFF) << "-"
+         << std::setw(4) << (data[2] & 0xFFFF) << std::setw(8) << data[3];
+
+    return uuid.str();
 }
 
 }

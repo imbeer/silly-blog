@@ -248,7 +248,6 @@ DROGON_TEST(GetCommentTest)
 
 DROGON_TEST(NewCommentTest)
 {
-    // todo: fix creating + edit + delete
     auto client = HttpClient::newHttpClient("http://127.0.0.1:8080");
     string ownerJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMDYifQ.xC3afYlIgVBwESPQWnNTOdQrd116i2OAngDigY62cfk";
     string adminJwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsInVzZXIiOiIyMTEifQ.a3R-w1k-ljSqVvsp8OkFWrfZOPV96etxnYvCyJ408n8";

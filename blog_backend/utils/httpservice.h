@@ -9,12 +9,9 @@ using namespace std;
 namespace httpService
 {
 
-optional<string> saveImageFromReq(
-    const shared_ptr<function<void(const HttpResponsePtr &)>> &callback,
-    const HttpRequest &req);
+optional<string> saveImageFromReq(const HttpRequestPtr &req);
 
-
-string generateUniqueFileName();
+string generateUUID();
 
 inline void sendImageByPath(
     const string &path,

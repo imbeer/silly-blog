@@ -27,9 +27,8 @@ void ImageController::upload(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    const int postId = parseService::getPostIdFromRequest(*req);
 
-    const optional<string> path = httpService::saveImageFromReq(callbackPtr, *req);
+    const optional<string> path = httpService::saveImageFromReq(/*callbackPtr, */req);
     if (!path.has_value()) {
         httpService::sendEmptyResponse(callbackPtr, k500InternalServerError);
         return;
@@ -37,13 +36,12 @@ void ImageController::upload(
 
     drogon_model::blog::Image image;
     image.setUrl(path.value());
-    image.setPostId(postId);
 
     m_imageMapper.insert(
         image,
         [callbackPtr](const drogon_model::blog::Image &image)
         {
-            auto resp = HttpResponse::newHttpJsonResponse(image.toJson());
+            auto resp = HttpResponse::newHttpJsonResponse(image.toJson()["image_id"]);
             resp->setStatusCode(drogon::k201Created);
             (*callbackPtr)(resp);
         },
