@@ -37,7 +37,6 @@ string generateUUID()
         d = dist(gen);
     }
 
-    // Convert to UUID version 4 format
     data[1] = (data[1] & 0xFFFF0FFF) | 0x00004000; // Version 4 (0100)
     data[2] = (data[2] & 0x3FFFFFFF) | 0x80000000; // Variant 1 (10xx)
 

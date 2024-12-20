@@ -6,12 +6,12 @@
 void ImageController::get(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback,
-    const int& id)
+    const int& imageId)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
 
     m_imageMapper.findByPrimaryKey(
-        id,
+        imageId,
         [callbackPtr](const drogon_model::blog::Image &image)
         {
             httpService::sendImageByPath(image.getValueOfUrl(), callbackPtr);

@@ -17,7 +17,7 @@ inline void sendImageByPath(
     const string &path,
     const shared_ptr<function<void(const HttpResponsePtr &)>> &callback)
 {
-    (*callback)(HttpResponse::newFileResponse("./uploads" + path, "", CT_IMAGE_JPG));
+    (*callback)(HttpResponse::newFileResponse("./uploads/" + path, "", CT_IMAGE_JPG));
 }
 
 inline void sendEmptyResponse(

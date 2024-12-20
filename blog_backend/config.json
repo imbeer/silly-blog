@@ -56,7 +56,7 @@
             "log_level": "DEBUG"
         },
         "run_as_daemon": false,
-        "relaunch_on_error": false,
+        "relaunch_on_error": true,
         "use_sendfile": true,
         "use_gzip": true,
         "static_files_cache_time": 5,
