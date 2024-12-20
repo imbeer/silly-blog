@@ -51,18 +51,18 @@ void ImageController::upload(
         });
 }
 
-void ImageController::remove(
-    const HttpRequestPtr &req,
-    function<void(const HttpResponsePtr &)> &&callback)
-{
-    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    const int imageId = parseService::getImageIdFromRequest(*req);
+// void ImageController::remove(
+//     const HttpRequestPtr &req,
+//     function<void(const HttpResponsePtr &)> &&callback)
+// {
+//     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+//     const int imageId = parseService::getImageIdFromRequest(*req);
 
 
-    try {
-        m_imageMapper.deleteByPrimaryKey(imageId);
-        httpService::sendEmptyResponse(callbackPtr, k204NoContent);
-    } catch (const exception &e) {
-        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-    }
-}
+//     try {
+//         m_imageMapper.deleteByPrimaryKey(imageId);
+//         httpService::sendEmptyResponse(callbackPtr, k204NoContent);
+//     } catch (const exception &e) {
+//         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+//     }
+// }
