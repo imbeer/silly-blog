@@ -1,4 +1,4 @@
-version: '3.8'
+name: blogapp
 
 services:
   db:
@@ -19,7 +19,7 @@ services:
 
   blog_app:
     build:
-      context: ./app/blog_backend
+      context: ./blog_backend
       dockerfile: Dockerfile
     container_name: drogon_app
     depends_on:
@@ -31,7 +31,7 @@ services:
     volumes:
       - uploads:/app/blog_backend/build/uploads
     environment:
-      - IMAGE_DIR=/app/images 
+      - IMAGE_DIR=/app/blog_backend/build/uploads
 
 volumes:
   db_data:
