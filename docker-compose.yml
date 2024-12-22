@@ -10,8 +10,8 @@ services:
       POSTGRES_PASSWORD: 1440
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./app/database.sql:/docker-entrypoint-initdb.d/database.sql
-      - ./app/migrations.sql:/docker-entrypoint-initdb.d/migrations.sql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
+      - ./migrations.sql:/docker-entrypoint-initdb.d/migrations.sql
     ports:
       - "5432:5432"
     networks:
