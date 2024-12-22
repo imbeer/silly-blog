@@ -10,8 +10,7 @@ services:
       POSTGRES_PASSWORD: 1440
     volumes:
       - db_data:/var/lib/postgresql/data
-      - ./database.sql:/docker-entrypoint-initdb.d/database.sql
-      - ./migrations.sql:/docker-entrypoint-initdb.d/migrations.sql
+      - ./sql-scripts:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
     networks:
@@ -30,13 +29,16 @@ services:
     networks:
       - blog_network
     volumes:
-      - uploads:/app/blog_backend/build/uploads
+      - uploads:/app/blog_backend/build/uploads # images dir
+      - ./local_config:/app/blog_backend/local_config # config.json dir
     environment:
       - IMAGE_DIR=/app/blog_backend/build/uploads
 
 volumes:
   db_data:
+    driver: local
   uploads:
+    driver: local
 
 networks:
   blog_network:

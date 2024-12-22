@@ -2,7 +2,7 @@
 int main() {
 
     drogon::app()
-        .loadConfigFile("../config.json")
+        .loadConfigFile("../local_config/config.json")
         // .addListener("0.0.0.0", 8080)
         // .addDbClient(dbConfig)
         .run();
