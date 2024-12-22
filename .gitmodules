@@ -1,0 +1,6 @@
+[submodule "blog_backend/3rdparty/jwt-cpp"]
+    path = blog_backend/3rdparty/jwt-cpp
+    url = git@github.com:Thalhammer/jwt-cpp.git
+[submodule "blog_backend/3rdparty/libbcrypt"]
+    path = blog_backend/3rdparty/libbcrypt
+    url = git@github.com:trusch/libbcrypt.git
