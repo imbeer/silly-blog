@@ -20,7 +20,6 @@ services:
     build:
       context: ./blog_backend
       dockerfile: Dockerfile
-#    image: imbeer/blog-blog_app:latest
     container_name: drogon_app
     depends_on:
       - db
@@ -29,10 +28,10 @@ services:
     networks:
       - blog_network
     volumes:
-      - uploads:/blog_backend/build/uploads # images dir
-      - ./blog_backend/local_config:/blog_backend/local_config # config.json dir
-    environment:
-      - IMAGE_DIR=/app/blog_backend/build/uploads
+      - uploads:/build/uploads # images dir
+      - ./local_config:/local_config # config.json dir
+#    environment:
+#      - IMAGE_DIR=/app/blog_backend/build/uploads
 
 volumes:
   db_data:
