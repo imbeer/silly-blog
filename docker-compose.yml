@@ -18,9 +18,10 @@ services:
       - blog_network
 
   blog_app:
-    build:
-      context: ./blog_backend
-      dockerfile: Dockerfile
+#    build:
+#      context: ./blog_backend
+#      dockerfile: Dockerfile
+    image: imbeer/blog-blog_app:latest
     container_name: drogon_app
     depends_on:
       - db
