@@ -10,8 +10,6 @@ using namespace drogon;
 namespace parseService
 {
 
-// todo: change all usage of "ids" to optionals
-
 inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
     return drogon_model::blog::Post((*req.getJsonObject())["post"]);
 }
@@ -49,14 +47,14 @@ inline std::optional<int> getImageIdFromRequest(const HttpRequest &req) {
 }
 
 inline std::vector<int> getImageIdVectorFromRequest(const HttpRequest &req) {
-    auto imageIds = (*req.getJsonObject())["image"]["image_id"];
+    auto imageIds = (*req.getJsonObject())["images"];
     std::vector<int> imageIdVector;
     
-    if (!imageIds.empty()) {
-        for (const auto id : imageIds) {
-            if (id.isInt()) imageIdVector.push_back(id.asInt());
-        }
+    for (const auto &id : imageIds) {
+        if (id.isInt()) imageIdVector.push_back(id.asInt());
     }
+
+    return imageIdVector;
 }
 
 };

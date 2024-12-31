@@ -58,6 +58,7 @@ void PostController::get(
         postJson["likes"] = likes;
         postJson["isLiked"] = isLiked;
         postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
+        postJson["author"] = getPostOwnerName(callbackPtr, post.getValueOfUserId());
         responseBody.append(postJson);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
@@ -78,9 +79,10 @@ void PostController::create(
 
     m_postMapper.insert(
         newPost,
-        [callbackPtr](const drogon_model::blog::Post &post) {
+        [callbackPtr, req, this](const drogon_model::blog::Post &post) {
             auto json = Json::Value();
             json["post"] = post.toJson();
+            addImagesToPost(req, callbackPtr, post.getValueOfPostId());
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
             (*callbackPtr)(response);
@@ -189,4 +191,44 @@ Json::Value PostController::getImageIdsForPostId(const int& postId)
         imageIds.append(image.getValueOfImageId());
     }
     return imageIds;
+}
+
+void PostController::addImagesToPost(
+    const HttpRequestPtr &req,
+    const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
+    const int &postId)
+{
+    auto imageIds = parseService::getImageIdVectorFromRequest(*req);
+    bool errorFlag = false;
+    for (const int &id : imageIds) {
+        try {
+            auto image = m_imageMapper.findByPrimaryKey(postId);
+            if (image.getPostId() == nullptr) {
+                image.setPostId(postId);
+                m_imageMapper.update(image);
+            }
+            if (image.getValueOfPostId() != postId) {
+                httpService::sendEmptyResponse(callback, k403Forbidden);
+            }
+
+        } catch (const DrogonDbException &e) {
+            httpService::sendEmptyResponse(callback, k400BadRequest);
+        } catch (const exception &e) {
+            httpService::sendEmptyResponse(callback, k500InternalServerError);
+        }
+    }
+}
+
+string PostController::getPostOwnerName(
+    const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
+    const int &userId)
+{
+    try {
+        auto user = m_userMapper.findByPrimaryKey(userId);
+        return user.getValueOfUsername();
+    } catch (const DrogonDbException &e) {
+        /// not possible because of method usage actually but anyway.
+        httpService::sendEmptyResponse(callback, k500InternalServerError);
+        return "";
+    }
 }

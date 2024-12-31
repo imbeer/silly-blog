@@ -27,13 +27,22 @@ public:
     void create(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
-    void update(
+    void update( // todo: images updates
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
     void remove(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
+
+private:
     Json::Value getImageIdsForPostId(const int &postId);
+    void addImagesToPost(
+        const HttpRequestPtr &req,
+        const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
+        const int &postId);
+    string getPostOwnerName(
+        const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
+        const int &userId);
 
 
 private:
