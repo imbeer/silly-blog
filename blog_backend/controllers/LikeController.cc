@@ -47,7 +47,13 @@ void LikeController::like(
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     const int userId = jwtService::getCurrentUserIdFromRequest(req).value();
-    const int postId = parseService::getPostIdFromRequest(*req);
+
+    const optional<int> postIdOptional = parseService::getPostIdFromRequest(*req);
+    if (!postIdOptional.has_value() || postIdOptional.value() < 0) {
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+    const int postId = postIdOptional.value();
 
     const auto postCriteria = Criteria(
         drogon_model::blog::Like::Cols::_post_id,
@@ -93,7 +99,13 @@ void LikeController::dislike(
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     const int userId = jwtService::getCurrentUserIdFromRequest(req).value();
-    const int postId = parseService::getPostIdFromRequest(*req);
+
+    const optional<int> postIdOptional = parseService::getPostIdFromRequest(*req);
+    if (!postIdOptional.has_value() || postIdOptional.value() < 0) {
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+    const int postId = postIdOptional.value();
 
     const auto postCriteria = Criteria(
         drogon_model::blog::Like::Cols::_post_id,

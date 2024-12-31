@@ -10,7 +10,7 @@ using namespace drogon;
 namespace parseService
 {
 
-// todo: add optionals when there is no such thing.
+// todo: change all usage of "ids" to optionals
 
 inline drogon_model::blog::Post getPostFromRequest(const HttpRequest &req) {
     return drogon_model::blog::Post((*req.getJsonObject())["post"]);
@@ -24,20 +24,39 @@ inline drogon_model::blog::User getUserFromRequest(const HttpRequest &req) {
     return drogon_model::blog::User((*req.getJsonObject())["user"]);
 }
 
-inline int getPostIdFromRequest(const HttpRequest &req) {
-    return (*req.getJsonObject())["post"]["post_id"].asInt();
+inline std::optional<int> getPostIdFromRequest(const HttpRequest &req) {
+    auto postId = (*req.getJsonObject())["post"]["post_id"];
+    if (!postId.empty() && postId.isInt() && postId.asInt() >= 0) return postId.asInt();
+    else return std::nullopt;
 }
 
-inline int getCommentIdFromRequest(const HttpRequest &req) {
-    return (*req.getJsonObject())["comment"]["comment_id"].asInt();
+inline std::optional<int> getCommentIdFromRequest(const HttpRequest &req) {
+    auto commentId =  (*req.getJsonObject())["comment"]["comment_id"];
+    if (!commentId.empty() && commentId.isInt() && commentId.asInt() >= 0) return commentId.asInt();
+    else return std::nullopt;
 }
 
-inline int getUserIdFromRequest(const HttpRequest &req) {
-    return (*req.getJsonObject())["user"]["user_id"].asInt();
+inline std::optional<int> getUserIdFromRequest(const HttpRequest &req) {
+    auto userId = (*req.getJsonObject())["user"]["user_id"];
+    if (!userId.empty() && userId.isInt() && userId.asInt() >= 0) return userId.asInt();
+    else return std::nullopt;
 }
 
-inline int getImageIdFromRequest(const HttpRequest &req) {
-    return (*req.getJsonObject())["image"]["image_id"].asInt();
+inline std::optional<int> getImageIdFromRequest(const HttpRequest &req) {
+    auto imageId = (*req.getJsonObject())["image"]["image_id"];
+    if (!imageId.empty() && imageId.isInt() && imageId.asInt() >= 0) return imageId.asInt();
+    else return std::nullopt;
+}
+
+inline std::vector<int> getImageIdVectorFromRequest(const HttpRequest &req) {
+    auto imageIds = (*req.getJsonObject())["image"]["image_id"];
+    std::vector<int> imageIdVector;
+    
+    if (!imageIds.empty()) {
+        for (const auto id : imageIds) {
+            if (id.isInt()) imageIdVector.push_back(id.asInt());
+        }
+    }
 }
 
 };

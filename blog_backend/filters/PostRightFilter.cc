@@ -22,12 +22,17 @@ void PostRightFilter::doFilter(
 
     auto json = req->getJsonObject();
 
-    const int postId = parseService::getPostIdFromRequest(*req);
+    const optional<int> postId = parseService::getPostIdFromRequest(*req);
+    if (!postId.has_value() || postId.value() < 0) {
+        auto res = drogon::HttpResponse::newHttpResponse();
+        res->setStatusCode(drogon::k400BadRequest);
+        fcb(res);
+    }
     const auto posts = m_postMapper.findBy(
         Criteria(
             drogon_model::blog::Post::Cols::_post_id,
             CompareOperator::EQ,
-            postId));
+            postId.value()));
     if (posts.empty()) {
         auto res = drogon::HttpResponse::newHttpResponse();
         res->setStatusCode(k400BadRequest);

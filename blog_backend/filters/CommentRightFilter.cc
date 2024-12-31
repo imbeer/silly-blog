@@ -22,12 +22,17 @@ void CommentRightFilter::doFilter(
 
     auto json = req->getJsonObject();
 
-    const int commentId = parseService::getCommentIdFromRequest(*req);
+    const optional<int> commentId = parseService::getCommentIdFromRequest(*req);
+    if (!commentId.has_value() || commentId.value() < 0) {
+        auto res = drogon::HttpResponse::newHttpResponse();
+        res->setStatusCode(drogon::k400BadRequest);
+        fcb(res);
+    }
     const auto comments = m_commentMapper.findBy(
         Criteria(
             drogon_model::blog::Comment::Cols::_comment_id,
             CompareOperator::EQ,
-            commentId));
+            commentId.value()));
     if (comments.empty()) {
         auto res = drogon::HttpResponse::newHttpResponse();
         res->setStatusCode(k400BadRequest);

@@ -123,7 +123,12 @@ void CommentController::remove(
     std::function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    const int commentId = parseService::getCommentIdFromRequest(*req);
+    const optional<int> commentIdOptional = parseService::getCommentIdFromRequest(*req);
+    if (!commentIdOptional.has_value() || commentIdOptional.value() < 0) {
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+    const int commentId = commentIdOptional.value();
 
     try {
         m_commentMapper.deleteByPrimaryKey(commentId);

@@ -78,7 +78,12 @@ void PostController::remove(
     function<void(const HttpResponsePtr &)> &&callback)
 {
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    const int postId = parseService::getPostIdFromRequest(*req);
+    const optional<int> postIdOptional = parseService::getPostIdFromRequest(*req);
+    if (!postIdOptional.has_value() || postIdOptional.value() < 0) {
+        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        return;
+    }
+    const int postId = postIdOptional.value();
 
     try {
         const auto commentCriteria = Criteria(
