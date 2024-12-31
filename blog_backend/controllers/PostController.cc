@@ -12,7 +12,10 @@ void PostController::get(
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     Json::Value responseBody;
     Criteria ownerCriteria;
-    Criteria promptCriteria;
+    Criteria promptCriteria = Criteria(
+        drogon_model::blog::Post::Cols::_text_content,
+        CompareOperator::Like,
+        "%" + prompt + "%");;
 
     if (!author.empty()) {
         const Criteria userCriteria(
@@ -20,29 +23,20 @@ void PostController::get(
             CompareOperator::EQ,
             author);
         const auto users = m_userMapper.findBy(userCriteria);
-        if (users.empty()) {
-            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-            return;
+        if (!users.empty()) {
+            const auto userId = users[0].getValueOfUserId();
+            ownerCriteria = Criteria(
+                drogon_model::blog::Post::Cols::_user_id,
+                CompareOperator::EQ,
+                userId);
         }
-        const auto userId = users[0].getValueOfUserId();
-        ownerCriteria = Criteria(
-            drogon_model::blog::Post::Cols::_user_id,
-            CompareOperator::EQ,
-            userId);
-    }
-
-    if (!prompt.empty()) {
-        promptCriteria = Criteria(
-            drogon_model::blog::Post::Cols::_text_content,
-            CompareOperator::Like,
-            "%" + prompt + "%");
     }
 
     const auto posts = m_postMapper
                            .orderBy(drogon_model::blog::Post::Cols::_time)
                            .limit(limit)
                            .offset(offset)
-                           .findBy(promptCriteria);
+                           .findBy(promptCriteria && ownerCriteria); //todo: error fix
 
     const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
     const auto likeUserCriteria = Criteria(
@@ -63,6 +57,7 @@ void PostController::get(
 
         postJson["likes"] = likes;
         postJson["isLiked"] = isLiked;
+        postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
         responseBody.append(postJson);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
@@ -177,4 +172,21 @@ void PostController::remove(
     } catch (const std::exception &e) {
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
+}
+
+Json::Value PostController::getImageIdsForPostId(const int& postId)
+{
+    Json::Value imageIds(Json::arrayValue);
+
+    Criteria imageCriteria = Criteria(
+        drogon_model::blog::Image::Cols::_post_id,
+        CompareOperator::EQ,
+        postId);
+
+    auto images = m_imageMapper.findBy(imageCriteria);
+
+    for (const auto &image : images) {
+        imageIds.append(image.getValueOfImageId());
+    }
+    return imageIds;
 }

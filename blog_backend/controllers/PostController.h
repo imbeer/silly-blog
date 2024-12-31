@@ -13,7 +13,7 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(PostController::get, "/posts?author?={}&prompt?={}&offset={}&limit={}", Get, "LoginFilter");
+        ADD_METHOD_TO(PostController::get, "/posts?author={1}&prompt={2}&offset={3}&limit={4}", Get, "LoginFilter");
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
         ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "PostRightFilter");
         ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "PostRightFilter");
@@ -33,6 +33,7 @@ public:
     void remove(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
+    Json::Value getImageIdsForPostId(const int &postId);
 
 
 private:
