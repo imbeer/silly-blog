@@ -3,6 +3,73 @@
 #include "../utils/parseservice.h"
 #include "../utils/httpservice.h"
 
+void PostController::get(
+    const HttpRequestPtr &req,
+    std::function<void (const HttpResponsePtr &)> &&callback,
+    const string &author, const string &prompt,
+    const int offset, const int limit)
+{
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    Json::Value responseBody;
+    Criteria ownerCriteria;
+    Criteria promptCriteria;
+
+    if (!author.empty()) {
+        const Criteria userCriteria(
+            drogon_model::blog::User::Cols::_username,
+            CompareOperator::EQ,
+            author);
+        const auto users = m_userMapper.findBy(userCriteria);
+        if (users.empty()) {
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+            return;
+        }
+        const auto userId = users[0].getValueOfUserId();
+        ownerCriteria = Criteria(
+            drogon_model::blog::Post::Cols::_user_id,
+            CompareOperator::EQ,
+            userId);
+    }
+
+    if (!prompt.empty()) {
+        promptCriteria = Criteria(
+            drogon_model::blog::Post::Cols::_text_content,
+            CompareOperator::Like,
+            "%" + prompt + "%");
+    }
+
+    const auto posts = m_postMapper
+                           .orderBy(drogon_model::blog::Post::Cols::_time)
+                           .limit(limit)
+                           .offset(offset)
+                           .findBy(promptCriteria);
+
+    const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
+    const auto likeUserCriteria = Criteria(
+        drogon_model::blog::Like::Cols::_user_id,
+        CompareOperator::EQ,
+        currentUserId);
+
+    for (const auto &post : posts)
+    {
+        auto postJson = post.toJson();
+        const auto likePostCriteria = Criteria(
+            drogon_model::blog::Like::Cols::_post_id,
+            CompareOperator::EQ,
+            post.getValueOfPostId());
+
+        const int likes = m_likeMapper.count(likePostCriteria);
+        const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
+
+        postJson["likes"] = likes;
+        postJson["isLiked"] = isLiked;
+        responseBody.append(postJson);
+    }
+    auto response = HttpResponse::newHttpJsonResponse(responseBody);
+    response->setStatusCode(HttpStatusCode::k200OK);
+    (*callbackPtr)(response);
+}
+
 void PostController::create(
     const HttpRequestPtr &req,
     function<void(const HttpResponsePtr &)> &&callback)
@@ -111,64 +178,3 @@ void PostController::remove(
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
-
-void PostController::get(
-    const HttpRequestPtr &req,
-    std::function<void (const HttpResponsePtr &)> &&callback,
-    const string &authorUsername,
-    const int offset, const int limit)
-{
-    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    Json::Value responseBody;
-    Criteria postCriteria;
-
-    if (!authorUsername.empty()) {
-        const Criteria userCriteria(
-            drogon_model::blog::User::Cols::_username,
-            CompareOperator::EQ,
-            authorUsername);
-        const auto users = m_userMapper.findBy(userCriteria);
-        if (users.empty()) {
-            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-            return;
-        }
-        const auto userId = users[0].getValueOfUserId();
-        postCriteria = Criteria(
-            drogon_model::blog::Post::Cols::_user_id,
-            CompareOperator::EQ,
-            userId);
-    }
-
-    const auto posts = m_postMapper
-        .orderBy(drogon_model::blog::Post::Cols::_time)
-        .limit(limit)
-        .offset(offset)
-        .findBy(postCriteria);
-
-    const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
-    const auto likeUserCriteria = Criteria(
-        drogon_model::blog::Like::Cols::_user_id,
-        CompareOperator::EQ,
-        currentUserId);
-
-    for (const auto &post : posts)
-    {
-        auto postJson = post.toJson();
-        const auto likePostCriteria = Criteria(
-                drogon_model::blog::Like::Cols::_post_id,
-                CompareOperator::EQ,
-                post.getValueOfPostId());
-
-        const int likes = m_likeMapper.count(likePostCriteria);
-        const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
-
-        postJson["likes"] = likes;
-        postJson["isLiked"] = isLiked;
-        responseBody.append(postJson);
-    }
-    auto response = HttpResponse::newHttpJsonResponse(responseBody);
-    response->setStatusCode(HttpStatusCode::k200OK);
-    (*callbackPtr)(response);
-}
-
-

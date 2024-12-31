@@ -13,12 +13,17 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
+        ADD_METHOD_TO(PostController::get, "/posts?author?={}&prompt?={}&offset={}&limit={}", Get, "LoginFilter");
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
         ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "PostRightFilter");
         ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "PostRightFilter");
-        ADD_METHOD_TO(PostController::get, "/posts?author={}&offset={}&limit={}", Get, "LoginFilter");
     METHOD_LIST_END
 
+    void get(
+        const HttpRequestPtr &req,
+        std::function<void (const HttpResponsePtr &)> &&callback,
+        const string &author, const string &prompt,
+        const int offset, const int limit);
     void create(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
@@ -28,11 +33,7 @@ public:
     void remove(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
-    void get(
-        const HttpRequestPtr &req,
-        std::function<void (const HttpResponsePtr &)> &&callback,
-        const string &author,
-        const int offset, const int limit);
+
 
 private:
     Mapper<drogon_model::blog::Post> m_postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
