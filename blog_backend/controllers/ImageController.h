@@ -13,15 +13,19 @@ class ImageController : public HttpController<ImageController>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(ImageController::get, "/image?image_id={}", drogon::Get);
+        ADD_METHOD_TO(ImageController::get, "/image?image_id={1}", drogon::Get);
+        ADD_METHOD_TO(ImageController::getByLink, "/image/{1}", drogon::Get);
         ADD_METHOD_TO(ImageController::upload, "/image/upload", drogon::Post/*, "LoginFilter"*/);
-        // ADD_METHOD_TO(ImageController::remove, "/image/delete", drogon::Delete, "LoginFilter");
     METHOD_LIST_END
 
     void get(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback,
         const int& imageId);
+    void getByLink(
+        const HttpRequestPtr &req,
+        function<void(const HttpResponsePtr &)> &&callback,
+        const string &link);
     void upload(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);

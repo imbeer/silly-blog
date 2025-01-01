@@ -1,7 +1,6 @@
 #include "ImageController.h"
 
 #include "../utils/httpservice.h"
-#include "../utils/parseservice.h"
 
 void ImageController::get(
     const HttpRequestPtr &req,
@@ -20,6 +19,14 @@ void ImageController::get(
         {
             httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
         });
+}
+void ImageController::getByLink(
+    const HttpRequestPtr &req,
+    function<void(const HttpResponsePtr &)> &&callback,
+    const string &link)
+{
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
+    httpService::sendImageByPath(link, callbackPtr);
 }
 
 void ImageController::upload(

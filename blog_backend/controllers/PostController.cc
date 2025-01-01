@@ -45,22 +45,26 @@ void PostController::get(
         CompareOperator::EQ,
         currentUserId);
 
-    for (const auto &post : posts)
-    {
-        auto postJson = post.toJson();
-        const auto likePostCriteria = Criteria(
-            drogon_model::blog::Like::Cols::_post_id,
-            CompareOperator::EQ,
-            post.getValueOfPostId());
+    try {
+        for (const auto &post : posts)
+        {
+            auto postJson = post.toJson();
+            const auto likePostCriteria = Criteria(
+                drogon_model::blog::Like::Cols::_post_id,
+                CompareOperator::EQ,
+                post.getValueOfPostId());
 
-        const int likes = m_likeMapper.count(likePostCriteria);
-        const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
+            const int likes = m_likeMapper.count(likePostCriteria);
+            const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
 
-        postJson["likes"] = likes;
-        postJson["isLiked"] = isLiked;
-        postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
-        postJson["author"] = getPostOwnerName(callbackPtr, post.getValueOfUserId());
-        responseBody.append(postJson);
+            postJson["likes"] = likes;
+            postJson["isLiked"] = isLiked;
+            postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
+            postJson["author"] = getPostOwnerName(post.getValueOfUserId());
+            responseBody.append(postJson);
+        }
+    } catch (const exception &e) {
+        httpService::sendEmptyResponse(callbackPtr, k500InternalServerError);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
     response->setStatusCode(HttpStatusCode::k200OK);
@@ -186,6 +190,12 @@ Json::Value PostController::getImageIdsForPostId(const int& postId)
     return imageIds;
 }
 
+string PostController::getPostOwnerName(const int &userId)
+{
+    auto user = m_userMapper.findByPrimaryKey(userId);
+    return user.getValueOfUsername();
+}
+
 void PostController::addImagesToPost(
     const HttpRequestPtr &req,
     const int &postId)
@@ -216,18 +226,4 @@ void PostController::addImagesToPost(
         {"post_id"},
         imagesToAddCriteria,
         postId);
-}
-
-string PostController::getPostOwnerName(
-    const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
-    const int &userId)
-{
-    try {
-        auto user = m_userMapper.findByPrimaryKey(userId);
-        return user.getValueOfUsername();
-    } catch (const DrogonDbException &e) {
-        /// not possible because of method usage actually but anyway.
-        httpService::sendEmptyResponse(callback, k500InternalServerError);
-        return "";
-    }
 }

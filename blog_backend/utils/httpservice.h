@@ -17,7 +17,11 @@ inline void sendImageByPath(
     const string &path,
     const shared_ptr<function<void(const HttpResponsePtr &)>> &callback)
 {
-    (*callback)(HttpResponse::newFileResponse("./uploads/" + path, "", CT_IMAGE_JPG));
+    try {
+        (*callback)(HttpResponse::newFileResponse("./uploads/" + path, "", CT_IMAGE_JPG));
+    } catch (const exception &e) {
+        (*callback)(HttpResponse::newHttpResponse(drogon::k400BadRequest, CT_NONE));
+    }
 }
 
 inline void sendEmptyResponse(

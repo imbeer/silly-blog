@@ -37,12 +37,10 @@ public:
 
 private:
     Json::Value getImageIdsForPostId(const int &postId);
+    string getPostOwnerName(const int &userId);
     void addImagesToPost(
         const HttpRequestPtr &req,
         const int &postId);
-    string getPostOwnerName(
-        const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
-        const int &userId);
 
 
 private:
