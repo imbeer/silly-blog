@@ -18,25 +18,26 @@ void PostController::get(
         "%" + prompt + "%");;
 
     if (!author.empty()) {
-        const Criteria userCriteria(
+        const auto users = m_userMapper.findBy(Criteria(
             drogon_model::blog::User::Cols::_username,
             CompareOperator::EQ,
-            author);
-        const auto users = m_userMapper.findBy(userCriteria);
-        if (!users.empty()) {
-            const auto userId = users[0].getValueOfUserId();
-            ownerCriteria = Criteria(
-                drogon_model::blog::Post::Cols::_user_id,
-                CompareOperator::EQ,
-                userId);
+            author));
+        if (users.empty()) {
+            httpService::sendEmptyResponse(callbackPtr, k200OK);
+            return;
         }
+        const auto userId = users[0].getValueOfUserId();
+        ownerCriteria = Criteria(
+            drogon_model::blog::Post::Cols::_user_id,
+            CompareOperator::EQ,
+            userId);
     }
 
     const auto posts = m_postMapper
                            .orderBy(drogon_model::blog::Post::Cols::_time)
                            .limit(limit)
                            .offset(offset)
-                           .findBy(promptCriteria && ownerCriteria); //todo: error fix
+                           .findBy(promptCriteria && ownerCriteria);
 
     const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
     const auto likeUserCriteria = Criteria(
@@ -82,7 +83,7 @@ void PostController::create(
         [callbackPtr, req, this](const drogon_model::blog::Post &post) {
             auto json = Json::Value();
             json["post"] = post.toJson();
-            addImagesToPost(req, callbackPtr, post.getValueOfPostId());
+            addImagesToPost(req, post.getValueOfPostId());
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
             (*callbackPtr)(response);
@@ -121,17 +122,13 @@ void PostController::update(
         post.setTextContent(editedPost.getValueOfTextContent());
         m_postMapper.update(post);
 
+        addImagesToPost(req, post.getValueOfPostId());
+
         json["post"] = post.toJson();
         auto resp = HttpResponse::newHttpJsonResponse(json);
         resp->setStatusCode(HttpStatusCode::k200OK);
         (*callbackPtr)(resp);
-    } catch (const UnexpectedRows &e) {
-        LOG_ERROR << e.what();
-        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-    } catch (const DrogonDbException &e) {
-        LOG_ERROR << e.base().what();
-        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-    } catch (const std::runtime_error &e) {
+    } catch (const exception &e) {
         LOG_ERROR << e.what();
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
@@ -167,10 +164,6 @@ void PostController::remove(
         m_imageMapper.deleteBy(imageCriteria);
         m_postMapper.deleteByPrimaryKey(postId);
         httpService::sendEmptyResponse(callbackPtr, k204NoContent);
-    } catch (const UnexpectedRows &e) {
-        LOG_ERROR << e.what();
-        httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-
     } catch (const std::exception &e) {
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
@@ -195,28 +188,34 @@ Json::Value PostController::getImageIdsForPostId(const int& postId)
 
 void PostController::addImagesToPost(
     const HttpRequestPtr &req,
-    const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
     const int &postId)
 {
     auto imageIds = parseService::getImageIdVectorFromRequest(*req);
-    bool errorFlag = false;
-    for (const int &id : imageIds) {
-        try {
-            auto image = m_imageMapper.findByPrimaryKey(postId);
-            if (image.getPostId() == nullptr) {
-                image.setPostId(postId);
-                m_imageMapper.update(image);
-            }
-            if (image.getValueOfPostId() != postId) {
-                httpService::sendEmptyResponse(callback, k403Forbidden);
-            }
 
-        } catch (const DrogonDbException &e) {
-            httpService::sendEmptyResponse(callback, k400BadRequest);
-        } catch (const exception &e) {
-            httpService::sendEmptyResponse(callback, k500InternalServerError);
+    const auto existingImagesCriteria = Criteria(
+        drogon_model::blog::Image::Cols::_post_id,
+        CompareOperator::EQ,
+        postId);
+    const auto imagesToAddCriteria = Criteria(
+        drogon_model::blog::Image::Cols::_image_id,
+        CompareOperator::In,
+        imageIds);
+
+    for (const auto &image : m_imageMapper.findBy(imagesToAddCriteria)) {
+        if (image.getPostId() != nullptr && image.getValueOfPostId() != postId) {
+            throw runtime_error("Forbiden");
         }
     }
+
+    m_imageMapper.updateBy(
+        {"post_id"},
+        existingImagesCriteria,
+        nullptr);
+
+    m_imageMapper.updateBy(
+        {"post_id"},
+        imagesToAddCriteria,
+        postId);
 }
 
 string PostController::getPostOwnerName(

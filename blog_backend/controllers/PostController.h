@@ -10,6 +10,7 @@ using namespace drogon;
 using namespace std;
 using namespace drogon::orm;
 
+
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
@@ -27,7 +28,7 @@ public:
     void create(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
-    void update( // todo: images updates
+    void update(
         const HttpRequestPtr &req,
         function<void(const HttpResponsePtr &)> &&callback);
     void remove(
@@ -38,7 +39,6 @@ private:
     Json::Value getImageIdsForPostId(const int &postId);
     void addImagesToPost(
         const HttpRequestPtr &req,
-        const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
         const int &postId);
     string getPostOwnerName(
         const std::shared_ptr<function<void(const HttpResponsePtr &)>> callback,
