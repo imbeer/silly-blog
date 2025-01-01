@@ -28,7 +28,7 @@ services:
     networks:
       - blog_network
     volumes:
-      - uploads:/app/blog_backend/build/uploads # images dir
+      - uploads:/app/blog_backend/uploads # images dir
       - ./blog_backend/local_config:/app/blog_backend/local_config # config.json dir
 #    environment:
 #      - IMAGE_DIR=/app/blog_backend/build/uploads
