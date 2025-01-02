@@ -15,8 +15,8 @@ class UserController: public drogon::HttpController<UserController>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(UserController::search, "/user?bioprompt={1}&usernameprompt={2}&limit={3}&offset={4}", drogon::Get);
-        ADD_METHOD_TO(UserController::get, "/user/{1}", drogon::Get);
+        ADD_METHOD_TO(UserController::search, "/users?bioprompt={1}&usernameprompt={2}&limit={3}&offset={4}", drogon::Get);
+        ADD_METHOD_TO(UserController::get, "/user?id={1}", drogon::Get);
         ADD_METHOD_TO(UserController::create, "/register", drogon::Post); // todo: change endpoints in tests
         ADD_METHOD_TO(UserController::login, "/login", drogon::Post);
         ADD_METHOD_TO(UserController::updateImage, "/user/image", drogon::Put, "LoginFilter");
