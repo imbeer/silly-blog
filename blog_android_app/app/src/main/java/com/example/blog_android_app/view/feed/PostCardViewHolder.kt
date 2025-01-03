@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
+import com.example.blog_android_app.repository.likes.LikeRestController
 
 class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val viewPager = itemView.findViewById<ViewPager2>(R.id.viewpager)
@@ -29,7 +30,11 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //        }
 
         likeButton.setOnClickListener {
-            postData.isLiked = !postData.isLiked
+            if (postData.isLiked) {
+                LikeRestController.unlikePost(postData = postData)
+            } else {
+                LikeRestController.likePost(postData = postData)
+            }
             setLikeButtonIcon(postData.isLiked, likeButton)
         }
     }
