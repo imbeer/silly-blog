@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
+import com.example.blog_android_app.TEST_USERNAME
 import com.example.blog_android_app.feed.PostFeedAdapter
 
 class ProfileFragment : Fragment() {
@@ -30,9 +31,10 @@ class ProfileFragment : Fragment() {
         image = view.findViewById(R.id.profile_user_image)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        adapter = PostFeedAdapter(mutableListOf())
-        adapter.loadInitialData()
+        adapter = PostFeedAdapter(mutableListOf(), TEST_USERNAME)
+        adapter.loadData()
         recyclerView.adapter = adapter
+        username.text = TEST_USERNAME
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -45,7 +47,7 @@ class ProfileFragment : Fragment() {
                 if (!adapter.isLoading() && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     && firstVisibleItemPosition >= 0
                 ) {
-                    adapter.loadMoreData()
+                    adapter.loadData()
                 }
             }
         })
