@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.blog_android_app.DEFAULT_POSTS_LIMIT
 import com.example.blog_android_app.model.PostData
-import com.example.blog_android_app.repository.PostRestController
+import com.example.blog_android_app.repository.posts.PostRestController
 import kotlinx.coroutines.runBlocking
 
 class PostListViewModel(

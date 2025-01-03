@@ -1,19 +1,14 @@
-package com.example.blog_android_app.repository
+package com.example.blog_android_app.repository.posts
 
-import com.example.blog_android_app.BASE_URL
 import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import com.example.blog_android_app.repository.connection.RetrofitInstance
 
 object PostRestController {
     private val api: PostApiService
 
     init {
-        val retrofit = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        val retrofit = RetrofitInstance.instance
         api = retrofit.create(PostApiService::class.java)
     }
 

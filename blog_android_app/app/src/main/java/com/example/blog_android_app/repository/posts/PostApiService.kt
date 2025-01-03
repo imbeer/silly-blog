@@ -1,4 +1,4 @@
-package com.example.blog_android_app.repository
+package com.example.blog_android_app.repository.posts
 
 import com.example.blog_android_app.model.PostData
 import retrofit2.Response
