@@ -23,7 +23,7 @@ class FeedFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         adapter = PostFeedAdapter(mutableListOf())
-        adapter.loadInitialData()
+        adapter.loadData()
         recyclerView.adapter = adapter
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -34,10 +34,10 @@ class FeedFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if (!adapter.isLoading() && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
+                if (!adapter.isEnded() && !adapter.isLoading() && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
                     && firstVisibleItemPosition >= 0
                 ) {
-                    adapter.loadMoreData()
+                    adapter.loadData()
                 }
             }
         })
