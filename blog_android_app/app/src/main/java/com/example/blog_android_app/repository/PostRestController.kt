@@ -5,22 +5,8 @@ import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.Query
 
-interface PostApiService {
-    @GET("posts")
-    suspend fun getPosts(
-        @Header("Authorization") token: String,
-        @Query("author") author: String,
-        @Query("prompt") prompt: String,
-        @Query("offset") offset: Int,
-        @Query("limit") limit: Int
-    ): List<PostData>
-}
-
-object PostRepository {
+object PostRestController {
     private val api: PostApiService
 
     init {
@@ -28,7 +14,6 @@ object PostRepository {
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-
         api = retrofit.create(PostApiService::class.java)
     }
 
@@ -38,7 +23,16 @@ object PostRepository {
         prompt: String = "",
         offset: Int,
         limit: Int
-    ): List<PostData> {
-        return api.getPosts("Bearer $token", author, prompt, offset, limit)
+    ): List<PostData>? {
+        return api.getPosts("Bearer $token", author, prompt, offset, limit).body()
+    }
+
+    suspend fun createPost(
+        token: String = TEST_JWT,
+        textContent: String = "",
+        images: List<Int>
+    ): PostData {
+        val post = PostData(text_content = textContent, images = images)
+        return api.createPost(token, post)
     }
 }

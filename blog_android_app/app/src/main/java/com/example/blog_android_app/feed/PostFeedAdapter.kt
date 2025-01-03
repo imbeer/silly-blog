@@ -5,13 +5,18 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
-import com.example.blog_android_app.repository.PostRepository
+import com.example.blog_android_app.repository.PostRestController
 import kotlinx.coroutines.runBlocking
 
-class PostFeedAdapter(private val items: MutableList<PostData>) :
-    RecyclerView.Adapter<PostCardViewHolder>() {
+class PostFeedAdapter(
+    private val items: MutableList<PostData>,
+    private val author: String = "")
+    : RecyclerView.Adapter<PostCardViewHolder>()
+{
     private var loading = false
+    private var endOfFeed = false
     fun isLoading():Boolean = loading
+    fun isEnded(): Boolean = endOfFeed
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostCardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -31,19 +36,14 @@ class PostFeedAdapter(private val items: MutableList<PostData>) :
         notifyItemRangeInserted(startPosition, newItems.size)
     }
 
-    fun loadInitialData() {
-        runBlocking {
-            val initialItems = PostRepository.fetchPosts(offset = itemCount, limit = 5)
-            addItems(initialItems)
-        }
-    }
-
-    fun loadMoreData() {
+    fun loadData() {
         loading = true
         runBlocking {
-            val newItems = PostRepository.fetchPosts(offset = itemCount, limit = 5)
-
-            addItems(newItems)
+            val newItems = PostRestController.fetchPosts(author = author, offset = itemCount, limit = 5)
+            endOfFeed = newItems.isNullOrEmpty()
+            if (!endOfFeed) {
+                addItems(newItems!!)
+            }
             loading = false
         }
     }
