@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
 import com.example.blog_android_app.TEST_USERNAME
 import com.example.blog_android_app.feed.PostFeedAdapter
+import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class ProfileFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
@@ -31,23 +32,27 @@ class ProfileFragment : Fragment() {
         image = view.findViewById(R.id.profile_user_image)
         recyclerView.layoutManager = LinearLayoutManager(context)
 
-        adapter = PostFeedAdapter(mutableListOf(), TEST_USERNAME)
-        adapter.loadData()
+        val viewModel = PostListViewModel(username = TEST_USERNAME)
+
+        adapter = PostFeedAdapter(viewModel, this.viewLifecycleOwner)
+        viewModel.loadData()
         recyclerView.adapter = adapter
-        username.text = TEST_USERNAME
+        username.text = viewModel.getUsername()
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
+                if (viewModel.isEnded() || viewModel.isLoading()) {
+                    return
+                }
+
                 val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                 val visibleItemCount = layoutManager.childCount
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if (!adapter.isLoading() && (visibleItemCount + firstVisibleItemPosition) >= totalItemCount
-                    && firstVisibleItemPosition >= 0
-                ) {
-                    adapter.loadData()
+                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
+                    viewModel.loadData()
                 }
             }
         })

@@ -2,21 +2,29 @@ package com.example.blog_android_app.feed
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
-import com.example.blog_android_app.repository.PostRestController
-import kotlinx.coroutines.runBlocking
+import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class PostFeedAdapter(
-    private val items: MutableList<PostData>,
-    private val author: String = "")
-    : RecyclerView.Adapter<PostCardViewHolder>()
+    private val viewModel: PostListViewModel,
+    lifecycleOwner: LifecycleOwner
+) : RecyclerView.Adapter<PostCardViewHolder>()
 {
-    private var loading = false
-    private var endOfFeed = false
-    fun isLoading():Boolean = loading
-    fun isEnded(): Boolean = endOfFeed
+    private val postList = mutableListOf<PostData>()
+
+    init {
+        viewModel.posts.observe(lifecycleOwner) { newList ->
+            postList.clear()
+            postList.addAll(newList)
+        }
+
+        viewModel.notifyItemRangeInserted.observe(lifecycleOwner) { range ->
+            notifyItemRangeInserted(range.first, range.second)
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostCardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -24,27 +32,9 @@ class PostFeedAdapter(
         return PostCardViewHolder(view)
     }
 
-    override fun getItemCount(): Int = items.size
+    override fun getItemCount(): Int = postList.size
 
     override fun onBindViewHolder(holder: PostCardViewHolder, position: Int) {
-        holder.bind(items[position])
-    }
-
-    private fun addItems(newItems: List<PostData>) {
-        val startPosition = items.size
-        items.addAll(newItems)
-        notifyItemRangeInserted(startPosition, newItems.size)
-    }
-
-    fun loadData() {
-        loading = true
-        runBlocking {
-            val newItems = PostRestController.fetchPosts(author = author, offset = itemCount, limit = 5)
-            endOfFeed = newItems.isNullOrEmpty()
-            if (!endOfFeed) {
-                addItems(newItems!!)
-            }
-            loading = false
-        }
+        holder.bind(postList[position])
     }
 }
