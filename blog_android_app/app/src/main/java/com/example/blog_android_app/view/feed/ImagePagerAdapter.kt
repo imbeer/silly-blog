@@ -1,4 +1,4 @@
-package com.example.blog_android_app.feed
+package com.example.blog_android_app.view.feed
 
 import android.graphics.Bitmap
 import android.view.LayoutInflater

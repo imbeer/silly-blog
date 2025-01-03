@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
 import com.example.blog_android_app.TEST_USERNAME
-import com.example.blog_android_app.feed.PostFeedAdapter
+import com.example.blog_android_app.view.feed.PostFeedAdapter
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class ProfileFragment : Fragment() {

@@ -1,4 +1,4 @@
-package com.example.blog_android_app.edit
+package com.example.blog_android_app.view.edit
 
 import android.os.Bundle
 import android.view.LayoutInflater
