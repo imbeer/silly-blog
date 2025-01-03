@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
 import com.example.blog_android_app.R
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
@@ -41,7 +42,7 @@ class FeedFragment : Fragment() {
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
 
-                if ((visibleItemCount + firstVisibleItemPosition) >= totalItemCount && firstVisibleItemPosition >= 0) {
+                if ((visibleItemCount + firstVisibleItemPosition) >= (totalItemCount - DEFAULT_POSTS_WHEN_TO_LOAD) && firstVisibleItemPosition >= 0) {
                     viewModel.loadData()
 //                    adapter.notifyItemRangeInserted()
                 }
