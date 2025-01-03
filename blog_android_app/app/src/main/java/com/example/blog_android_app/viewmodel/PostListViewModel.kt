@@ -4,7 +4,7 @@ package com.example.blog_android_app.viewmodel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.blog_android_app.DEFAULT_POSTS_LIMIT
+import com.example.blog_android_app.DEFAULT_POSTS_LOAD_LIMIT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.posts.PostRestController
 import kotlinx.coroutines.runBlocking
@@ -12,7 +12,7 @@ import kotlinx.coroutines.runBlocking
 class PostListViewModel(
     private val username: String = "",
     private val searchPrompt: String = "",
-    private val loadLimit: Int = DEFAULT_POSTS_LIMIT
+    private val loadLimit: Int = DEFAULT_POSTS_LOAD_LIMIT
 ) : ViewModel () {
 
     private var loading = false
