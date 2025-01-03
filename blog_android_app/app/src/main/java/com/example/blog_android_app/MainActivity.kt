@@ -3,8 +3,8 @@ package com.example.blog_android_app
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.example.blog_android_app.edit.EditPostFragment
-import com.example.blog_android_app.feed.FeedFragment
+import com.example.blog_android_app.view.edit.EditPostFragment
+import com.example.blog_android_app.view.feed.FeedFragment
 import com.example.blog_android_app.profile.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
