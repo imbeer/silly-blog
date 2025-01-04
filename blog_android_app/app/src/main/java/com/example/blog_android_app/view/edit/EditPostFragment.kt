@@ -8,13 +8,14 @@ import android.widget.EditText
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import com.example.blog_android_app.R
+import com.example.blog_android_app.viewmodel.PostEditViewModel
 
-class EditPostFragment : Fragment() {
+class EditPostFragment(private val viewModel: PostEditViewModel) : Fragment() {
 
-    lateinit var editText: EditText
-    lateinit var submitButton: ImageButton
-    lateinit var attachButton: ImageButton
-    lateinit var clearButton: ImageButton
+    private lateinit var editText: EditText
+    private lateinit var submitButton: ImageButton
+    private lateinit var attachButton: ImageButton
+    private lateinit var clearButton: ImageButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,13 +45,16 @@ class EditPostFragment : Fragment() {
         if (editText.text.isEmpty()) {
             return
         }
-        // todo: Send http post request
+        viewModel.changeText(editText.text.toString())
+        viewModel.submit()
         editText.text.clear()
     }
     private fun clear() {
         editText.text.clear()
+        viewModel.clear()
     }
     private fun attach() {
-        // todo:
+        // todo: open gallery activity and choose file, then send it to server.
+        viewModel.addImage(1) // todo: change id
     }
 }
