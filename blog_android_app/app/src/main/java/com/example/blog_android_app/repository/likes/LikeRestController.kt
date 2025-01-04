@@ -1,9 +1,11 @@
 package com.example.blog_android_app.repository.likes
 
-import android.util.Log
 import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import kotlinx.coroutines.runBlocking
+import okhttp3.MediaType
+import okhttp3.RequestBody
 
 object LikeRestController {
     private val api: LikeApiService
@@ -13,23 +15,36 @@ object LikeRestController {
         api = retrofit.create(LikeApiService::class.java)
     }
 
-    // todo: Idk Im tired fuck it
-    fun likePost(token: String = TEST_JWT, postData: PostData) {
-        Log.d("TempTagLikePost", constructJson(postData))
-        val call = api.likePost("Bearer $token", constructJson(postData))
-        try {
-            val response = call.execute()
-            if (response.isSuccessful) postData.isLiked = true
-            else Log.d("TempTagLikePost", "not liked")
-        } catch (e: Exception) {
-            Log.d("TempTagLikePost", e.toString())
+    fun chaneLikeStatus(postData: PostData) {
+        if (postData.isLiked) {
+            runBlocking {
+                unlikePost(postData = postData)
+            }
+        } else {
+            runBlocking {
+                likePost(postData = postData)
+            }
         }
     }
 
-    fun unlikePost(token: String = TEST_JWT, postData: PostData) {
-        Log.d("TempTagDisLikePost", constructJson(postData))
-        api.unlikePost("Bearer $token", constructJson(postData))
+    private suspend fun likePost(token: String = TEST_JWT, postData: PostData) {
+        val response = api.likePost("Bearer $token", constructJson(postData))
+        if (response.isSuccessful) postData.isLiked = true
     }
 
-    private fun constructJson(postData: PostData): String = """{"post":{"post_id":${postData.post_id}}}"""
+    private suspend fun unlikePost(token: String = TEST_JWT, postData: PostData) {
+        val response = api.unlikePost("Bearer $token", constructJson(postData))
+        if (response.isSuccessful) postData.isLiked = false
+    }
+
+    private fun constructJson(postData: PostData): RequestBody =
+        RequestBody.create(
+            MediaType.parse("application/json; charset=utf-8"),
+            """
+            {
+                "post": {
+                    "post_id": ${postData.post_id}
+                }
+            }
+            """)
 }
