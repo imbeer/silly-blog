@@ -3,9 +3,11 @@ package com.example.blog_android_app
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.blog_android_app.model.PostData
+import com.example.blog_android_app.profile.ProfileFragment
 import com.example.blog_android_app.view.edit.EditPostFragment
 import com.example.blog_android_app.view.feed.FeedFragment
-import com.example.blog_android_app.profile.ProfileFragment
+import com.example.blog_android_app.viewmodel.PostEditViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
@@ -22,7 +24,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.nav_add_post -> {
-                    loadFragment(EditPostFragment())
+                    loadFragment(EditPostFragment(PostEditViewModel(PostData())))
                     true
                 }
                 R.id.nav_profile -> {
@@ -36,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         loadFragment(FeedFragment())
     }
 
-    fun loadFragment(fragment: Fragment) {
+    private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, fragment)
             .commit()
