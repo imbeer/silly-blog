@@ -30,11 +30,7 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //        }
 
         likeButton.setOnClickListener {
-            if (postData.isLiked) {
-                LikeRestController.unlikePost(postData = postData)
-            } else {
-                LikeRestController.likePost(postData = postData)
-            }
+            LikeRestController.chaneLikeStatus(postData)
             setLikeButtonIcon(postData.isLiked, likeButton)
         }
     }
