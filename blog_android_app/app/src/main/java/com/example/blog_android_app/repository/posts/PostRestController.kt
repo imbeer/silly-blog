@@ -1,8 +1,10 @@
 package com.example.blog_android_app.repository.posts
 
+import com.example.blog_android_app.JSON_TYPE
 import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import okhttp3.RequestBody
 
 object PostRestController {
     private val api: PostApiService
@@ -24,10 +26,13 @@ object PostRestController {
 
     suspend fun createPost(
         token: String = TEST_JWT,
-        textContent: String = "",
-        images: List<Int>
+        post: PostData
     ): PostData {
-        val post = PostData(text_content = textContent, images = images)
-        return api.createPost(token, post)
+        return api.createPost(token, constructJson(post))
     }
+
+    private fun constructJson(postData: PostData): RequestBody = RequestBody.create(
+            JSON_TYPE,
+            """{"post": {${postData.post_id?.let { "\"post_id\":$it," } ?: ""}"text_content": "${postData.text_content}","images": ${(postData.images ?: emptyList()).joinToString(prefix = "[", postfix = "]")}}}"""
+        )
 }

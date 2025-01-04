@@ -40,6 +40,7 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.converter)
     implementation(libs.gson)
+    implementation(libs.interceptor)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

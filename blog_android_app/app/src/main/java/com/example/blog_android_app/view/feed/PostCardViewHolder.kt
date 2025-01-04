@@ -35,15 +35,15 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         }
     }
 
-    private fun setLikeButtonIcon(like: Boolean, likebutton: ImageButton) {
+    private fun setLikeButtonIcon(like: Boolean, likeButton: ImageButton) {
         if (like) {
             val likeActive = ContextCompat.getDrawable(itemView.context, R.drawable.favorite_active)
-            likebutton.setImageDrawable(likeActive)
+            likeButton.setImageDrawable(likeActive)
         } else {
             val likeInactive = ContextCompat.getDrawable(itemView.context,
                 R.drawable.favorite_inactive
             )
-            likebutton.setImageDrawable(likeInactive)
+            likeButton.setImageDrawable(likeInactive)
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.example.blog_android_app.repository.likes
 
+import com.example.blog_android_app.JSON_TYPE
 import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
 import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType
 import okhttp3.RequestBody
 
 object LikeRestController {
@@ -39,7 +39,7 @@ object LikeRestController {
 
     private fun constructJson(postData: PostData): RequestBody =
         RequestBody.create(
-            MediaType.parse("application/json; charset=utf-8"),
+            JSON_TYPE,
             """
             {
                 "post": {
