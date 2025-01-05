@@ -18,7 +18,7 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 //    val imageview = itemView.findViewById<ImageView>(R.id.imageview)
 
     fun bind(postData: PostData) {
-        textUsernameView.text = postData.author
+        textUsernameView.text = postData.username
         textContentView.text = postData.textContent
         setLikeButtonIcon(postData.isLiked, likeButton)
         viewPager.visibility = View.GONE

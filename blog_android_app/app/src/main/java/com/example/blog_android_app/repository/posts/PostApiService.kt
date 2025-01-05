@@ -10,7 +10,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 interface PostApiService {
-    @GET("posts")
+    @GET("/posts")
     suspend fun getPosts(
         @Header("Authorization") token: String,
         @Query("author") author: String,
@@ -19,7 +19,7 @@ interface PostApiService {
         @Query("limit") limit: Int
     ): Response<List<PostData>>
 
-    @POST("posts")
+    @POST("/posts")
     suspend fun createPost(
         @Header("Authorization") token: String,
         @Body json: RequestBody
