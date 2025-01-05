@@ -28,7 +28,7 @@ object PostRestController {
         token: String = TEST_JWT,
         post: PostData
     ): PostData? {
-        val resp = api.createPost(token, constructJson(post))
+        val resp = api.createPost("Bearer $token", constructJson(post))
         return if (resp.isSuccessful) {
             resp.body()
         } else {
