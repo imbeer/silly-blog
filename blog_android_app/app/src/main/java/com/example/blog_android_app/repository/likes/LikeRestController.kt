@@ -43,7 +43,7 @@ object LikeRestController {
             """
             {
                 "post": {
-                    "post_id": ${postData.post_id}
+                    "post_id": ${postData.postId}
                 }
             }
             """)

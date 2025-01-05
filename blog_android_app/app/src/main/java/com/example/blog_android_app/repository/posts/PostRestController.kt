@@ -27,12 +27,17 @@ object PostRestController {
     suspend fun createPost(
         token: String = TEST_JWT,
         post: PostData
-    ): PostData {
-        return api.createPost(token, constructJson(post))
+    ): PostData? {
+        val resp = api.createPost(token, constructJson(post))
+        return if (resp.isSuccessful) {
+            resp.body()
+        } else {
+            null
+        }
     }
 
     private fun constructJson(postData: PostData): RequestBody = RequestBody.create(
             JSON_TYPE,
-            """{"post": {${postData.post_id?.let { "\"post_id\":$it," } ?: ""}"text_content": "${postData.text_content}","images": ${(postData.images ?: emptyList()).joinToString(prefix = "[", postfix = "]")}}}"""
+            """{"post": {${postData.postId?.let { "\"post_id\":$it," } ?: ""}"text_content": "${postData.textContent}","images": ${(postData.images ?: emptyList()).joinToString(prefix = "[", postfix = "]")}}}"""
         )
 }
