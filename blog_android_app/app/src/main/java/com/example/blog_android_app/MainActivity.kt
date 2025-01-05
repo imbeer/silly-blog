@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.example.blog_android_app.model.PostData
-import com.example.blog_android_app.profile.ProfileFragment
+import com.example.blog_android_app.view.profile.ProfileFragment
 import com.example.blog_android_app.view.edit.EditPostFragment
 import com.example.blog_android_app.view.feed.FeedFragment
 import com.example.blog_android_app.viewmodel.PostEditViewModel

@@ -1,4 +1,4 @@
-package com.example.blog_android_app.profile
+package com.example.blog_android_app.view.profile
 
 import android.os.Bundle
 import android.view.LayoutInflater
