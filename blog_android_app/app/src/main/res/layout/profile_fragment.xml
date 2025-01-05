@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/crust"
-    android:id="@+id/feed_fragment"
+    android:id="@+id/profile_fragment"
     android:orientation="vertical"
-    tools:context="profile.ProfileFragment">
+    tools:context=".view.profile.ProfileFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
