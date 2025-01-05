@@ -3,4 +3,6 @@
     <string name="empty_username">empty username</string>
     <string name="empty_post">empty post</string>
     <string name="empty_comment">empty_comment</string>
+    <string name="type_username">type username</string>
+    <string name="type_comment">type comment</string>
 </resources>

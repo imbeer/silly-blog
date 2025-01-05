@@ -13,7 +13,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/username"
+        android:id="@+id/comment_username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -22,7 +22,7 @@
         android:textStyle="bold" />
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/comment_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -37,14 +37,14 @@
         android:orientation="horizontal"
         android:visibility="gone">
             <ImageButton
-                android:id="@+id/edit_button"
+                android:id="@+id/comment_edit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="5dp"
                 android:background="@drawable/post_card_bg"
                 android:src="@drawable/edit" />
             <ImageButton
-                android:id="@+id/clear_button"
+                android:id="@+id/comment_clear_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/post_card_bg"
