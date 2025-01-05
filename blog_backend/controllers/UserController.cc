@@ -88,6 +88,7 @@ void UserController::login(
             if (BCrypt::validatePassword(newUser.getValueOfPassword(), passhash)) {
                 auto json = Json::Value();
                 json["user"] = user.toJson();
+                json["user"].removeMember("password");
                 json["token"] = jwtService::generateFromUser(user);
                 auto resp = HttpResponse::newHttpJsonResponse(json);
                 resp->setStatusCode(HttpStatusCode::k200OK);
@@ -124,6 +125,7 @@ void UserController::create(
         [callbackPtr](const User &user) {
             auto json = Json::Value();
             json["user"] = user.toJson();
+            json["user"].removeMember("password");
             json["token"] = jwtService::generateFromUser(user);
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);

@@ -36,6 +36,9 @@ public:
         std::function<void(const HttpResponsePtr &)> &&callback);
 
 private:
+    string getCommentOwnerName(const int &userId);
+
+private:
     Mapper<drogon_model::blog::Post> m_postMapper = Mapper<drogon_model::blog::Post>(app().getDbClient());
     Mapper<drogon_model::blog::User> m_userMapper = Mapper<drogon_model::blog::User>(app().getDbClient());
     Mapper<drogon_model::blog::Comment> m_commentMapper = Mapper<drogon_model::blog::Comment>(app().getDbClient());

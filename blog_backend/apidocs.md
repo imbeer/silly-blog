@@ -203,7 +203,8 @@ returns:
 [
     {
         "comment_id": int,
-        "user_id": int, 
+        "user_id": int,
+        "author": string (username),
         "text_content": int
         "time": timestamp   
         "canBeEdited": bool

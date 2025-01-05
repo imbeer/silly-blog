@@ -48,6 +48,7 @@ void CommentController::get(
         auto commentJson = comment.toJson();
         commentJson["canBeEdited"] = (currentUser->getValueOfIsAdmin() ||
                                       currentUser->getValueOfUserId() == comment.getValueOfUserId());
+        commentJson["author"] = getCommentOwnerName(comment.getValueOfUserId());
         responseBody.append(commentJson);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
@@ -143,4 +144,10 @@ void CommentController::remove(
         LOG_ERROR << e.what();
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
+}
+
+string CommentController::getCommentOwnerName(const int &userId)
+{
+    auto user = m_userMapper.findByPrimaryKey(userId);
+    return user.getValueOfUsername();
 }
