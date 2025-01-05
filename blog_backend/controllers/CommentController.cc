@@ -18,6 +18,8 @@ void CommentController::get(
     Criteria postCriteria;
     Criteria userCriteria;
 
+    const auto currentUser = jwtService::getCurrentUserFromRequest(req);
+
     if (!author.empty()) {
         const auto users = m_userMapper.findBy(
             Criteria(drogon_model::blog::User::Cols::_username, CompareOperator::EQ, author));
@@ -43,7 +45,10 @@ void CommentController::get(
                               .findBy(postCriteria && userCriteria);
 
     for (const auto &comment : comments) {
-        responseBody.append(comment.toJson());
+        auto commentJson = comment.toJson();
+        commentJson["canBeEdited"] = (currentUser->getValueOfIsAdmin() ||
+                                      currentUser->getValueOfUserId() == comment.getValueOfUserId());
+        responseBody.append(commentJson);
     }
     auto response = HttpResponse::newHttpJsonResponse(responseBody);
     response->setStatusCode(HttpStatusCode::k200OK);

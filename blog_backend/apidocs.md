@@ -118,6 +118,7 @@ returns:
         "isLiked": bool,
         "images": [int, int, int (image ids)]
         "time": timestamp
+        "canBeEdited" bool
     },
 ... sorted by time
 ]
@@ -191,6 +192,12 @@ Resp: 204 if ok, 400 if not, 403 if not available.
 
 Gets comments from post_id by author (username). If author empty, then gets comments from all users.
 
+requires:
+```
+jwt in authorisation:
+Authorisation: Bearer jwt   
+```
+
 returns:
 ```
 [
@@ -198,7 +205,8 @@ returns:
         "comment_id": int,
         "user_id": int, 
         "text_content": int
-        "time": timestamp
+        "time": timestamp   
+        "canBeEdited": bool
     }
 ]
 ```

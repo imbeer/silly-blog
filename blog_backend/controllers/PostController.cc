@@ -39,11 +39,11 @@ void PostController::get(
                            .offset(offset)
                            .findBy(promptCriteria && ownerCriteria);
 
-    const int currentUserId = jwtService::getCurrentUserIdFromRequest(req).value();
+    const auto currentUser = jwtService::getCurrentUserFromRequest(req);
     const auto likeUserCriteria = Criteria(
         drogon_model::blog::Like::Cols::_user_id,
         CompareOperator::EQ,
-        currentUserId);
+        currentUser->getValueOfUserId());
 
     try {
         for (const auto &post : posts)
@@ -61,6 +61,8 @@ void PostController::get(
             postJson["isLiked"] = isLiked;
             postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
             postJson["author"] = getPostOwnerName(post.getValueOfUserId());
+            postJson["canBeEdited"] = (currentUser->getValueOfIsAdmin() ||
+                                       currentUser->getValueOfUserId() == post.getValueOfUserId());
             responseBody.append(postJson);
         }
     } catch (const exception &e) {

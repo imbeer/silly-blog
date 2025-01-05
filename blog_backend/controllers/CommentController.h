@@ -13,7 +13,7 @@ class CommentController: public drogon::HttpController<CommentController>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(CommentController::get, "/post?id={}&author={}&offset={}&limit={}", Get);
+        ADD_METHOD_TO(CommentController::get, "/post?id={}&author={}&offset={}&limit={}", Get, "LoginFilter");
         ADD_METHOD_TO(CommentController::create, "/post/comment", Post);
         ADD_METHOD_TO(CommentController::update, "/post/comment", Put, "CommentRightFilter");
         ADD_METHOD_TO(CommentController::remove, "/post/comment", Delete, "CommentRightFilter");
