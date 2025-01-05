@@ -7,5 +7,5 @@ const val TEST_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXUyJ9.eyJpc3MiOiJhdXRoMCIsI
 const val TEST_USERNAME = "TheRealAmogus"
 const val DEFAULT_POSTS_LOAD_LIMIT = 10
 const val DEFAULT_POSTS_WHEN_TO_LOAD = 3
-const val DEFAULT_COMMENT_LIMIT = 10
+const val DEFAULT_COMMENT_LOAD_LIMIT = 10
 val JSON_TYPE = MediaType.parse("application/json; charset=utf-8")
