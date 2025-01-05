@@ -2,14 +2,12 @@ package com.example.blog_android_app.model
 
 import com.google.gson.annotations.SerializedName
 
-data class PostData(
+data class CommentData(
+    @SerializedName("comment_id") val commentId: Int? = null,
     @SerializedName("post_id") val postId: Int? = null,
     @SerializedName("user_id") val userId: Int? = null,
-    @SerializedName("text_content") var textContent: String = "",
+    @SerializedName("text_content") val textContent: String = "",
     @SerializedName("author") val username: String = "",
-    val likes: Int = 0,
-    var isLiked: Boolean = false,
     var canBeEdited: Boolean = false,
-    var images: List<Int>? = null,
     val time: String? = null
 )
