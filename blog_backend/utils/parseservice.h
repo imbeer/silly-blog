@@ -47,8 +47,9 @@ inline std::optional<int> getImageIdFromRequest(const HttpRequest &req) {
 }
 
 inline std::vector<int> getImageIdVectorFromRequest(const HttpRequest &req) {
-    auto imageIds = (*req.getJsonObject())["images"];
+    auto imageIds = (*req.getJsonObject())["post"]["images"];
     std::vector<int> imageIdVector;
+    if (imageIds.empty()) return imageIdVector;
     
     for (const auto &id : imageIds) {
         if (id.isInt()) imageIdVector.push_back(id.asInt());

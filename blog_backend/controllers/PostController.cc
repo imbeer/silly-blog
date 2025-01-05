@@ -93,10 +93,7 @@ void PostController::create(
             (*callbackPtr)(response);
         },
         [callbackPtr](const drogon::orm::DrogonDbException &e) {
-            LOG_ERROR << e.base().what();
-            auto response = HttpResponse::newHttpResponse();
-            response->setStatusCode(HttpStatusCode::k400BadRequest);
-            (*callbackPtr)(response);
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
         });
 }
 
@@ -201,6 +198,7 @@ void PostController::addImagesToPost(
     const int &postId)
 {
     auto imageIds = parseService::getImageIdVectorFromRequest(*req);
+    if (imageIds.empty()) return;
 
     const auto existingImagesCriteria = Criteria(
         drogon_model::blog::Image::Cols::_post_id,
