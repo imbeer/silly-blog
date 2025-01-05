@@ -19,8 +19,9 @@ object RetrofitInstance {
                 interceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
 
                 val client = OkHttpClient.Builder()
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+                    .connectTimeout(30, TimeUnit.SECONDS)
                     .addInterceptor(interceptor).build();
 
                 retrofit = Retrofit.Builder()

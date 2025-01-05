@@ -47,7 +47,6 @@ class EditPostFragment(private val viewModel: PostEditViewModel) : Fragment() {
         }
         viewModel.changeText(editText.text.toString())
         viewModel.submit()
-        editText.text.clear()
     }
     private fun clear() {
         editText.text.clear()
