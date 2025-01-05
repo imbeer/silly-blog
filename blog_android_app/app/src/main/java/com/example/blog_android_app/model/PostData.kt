@@ -9,6 +9,7 @@ data class PostData(
     @SerializedName("text_content") var textContent: String = "",
     val likes: Int = 0,
     var isLiked: Boolean = false,
+    var canBeEdited: Boolean = false,
     var images: List<Int>? = null,
     val time: String? = null
 )
