@@ -36,6 +36,14 @@ object PostRestController {
         }
     }
 
+    suspend fun deletePost(
+        token: String = TEST_JWT,
+        post: PostData
+    ): Boolean {
+        val resp = api.deletePost("Bearer $token", constructJson(post))
+        return (resp.code() == 204)
+    }
+
     private fun constructJson(postData: PostData): RequestBody = RequestBody.create(
             JSON_TYPE,
             """{"post": {${postData.postId?.let { "\"post_id\":$it," } ?: ""}"text_content": "${postData.textContent}","images": ${(postData.images ?: emptyList()).joinToString(prefix = "[", postfix = "]")}}}"""

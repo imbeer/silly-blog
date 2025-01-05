@@ -25,7 +25,7 @@ class EditPostFragment(private val viewModel: PostEditViewModel) : Fragment() {
         editText = view.findViewById(R.id.edit_text)
         submitButton = view.findViewById(R.id.submit_button)
         attachButton = view.findViewById(R.id.attach_button)
-        clearButton = view.findViewById(R.id.clear_button)
+        clearButton = view.findViewById(R.id.post_clear_button)
 
         submitButton.setOnClickListener {
             submit()
