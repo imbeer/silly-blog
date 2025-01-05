@@ -19,7 +19,7 @@ class PostCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(postData: PostData) {
         textUsernameView.text = postData.author
-        textContentView.text = postData.text_content
+        textContentView.text = postData.textContent
         setLikeButtonIcon(postData.isLiked, likeButton)
         viewPager.visibility = View.GONE
 

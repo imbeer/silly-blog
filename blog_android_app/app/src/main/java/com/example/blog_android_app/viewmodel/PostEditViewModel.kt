@@ -4,15 +4,13 @@ import android.util.Log
 import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.posts.PostRestController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class PostEditViewModel(private var postData: PostData) {
     private var images: MutableList<Int> = mutableListOf()
 
     fun changeText(text: String) {
-        postData.text_content = text
+        postData.textContent = text
     }
 
     fun addImage(imageId: Int) {
@@ -25,10 +23,9 @@ class PostEditViewModel(private var postData: PostData) {
 
     fun submit() {
         save()
-        CoroutineScope(Dispatchers.IO).launch {
+        runBlocking {
             try {
                 PostRestController.createPost(TEST_JWT, postData)
-                clear()
             } catch (e: Exception) {
                 Log.d("TempTagPostSubmit", e.toString())
             }
@@ -38,6 +35,6 @@ class PostEditViewModel(private var postData: PostData) {
     fun clear() {
         images.clear()
         postData.images = images
-        postData.text_content = ""
+        postData.textContent = ""
     }
 }
