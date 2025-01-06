@@ -1,9 +1,9 @@
 package com.example.blog_android_app.repository.posts
 
 import com.example.blog_android_app.JSON_TYPE
-import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import com.example.blog_android_app.repository.users.UserRestController
 import okhttp3.RequestBody
 
 object PostRestController {
@@ -15,7 +15,7 @@ object PostRestController {
     }
 
     suspend fun fetchPosts(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         author: String = "",
         prompt: String = "",
         offset: Int,
@@ -25,7 +25,7 @@ object PostRestController {
     }
 
     suspend fun createPost(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         post: PostData
     ): PostData? {
         val resp = api.createPost("Bearer $token", constructJson(post))
@@ -37,7 +37,7 @@ object PostRestController {
     }
 
     suspend fun editPost(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         post: PostData
     ): PostData? {
         val resp = api.editPost("Bearer $token", constructJson(post))
@@ -49,7 +49,7 @@ object PostRestController {
     }
 
     suspend fun deletePost(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         post: PostData
     ): Boolean {
         val resp = api.deletePost("Bearer $token", constructJson(post))
