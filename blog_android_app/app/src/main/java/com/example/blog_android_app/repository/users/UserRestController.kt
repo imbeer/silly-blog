@@ -2,6 +2,8 @@ package com.example.blog_android_app.repository.users
 
 import android.content.Context
 import com.example.blog_android_app.JSON_TYPE
+import com.example.blog_android_app.JWT_KEY
+import com.example.blog_android_app.PREF_NAME
 import com.example.blog_android_app.model.UserData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
 import okhttp3.RequestBody
@@ -20,15 +22,15 @@ object UserRestController {
     }
 
     fun isUserLoggedIn(context: Context): Boolean {
-        val prefs = context.getSharedPreferences("jwt", Context.MODE_PRIVATE)
-        _token = prefs.getString("jwt", null).toString()
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        _token = prefs.getString(JWT_KEY, null)
         return (token != null)
     }
 
     private fun setUserToken(context: Context) {
-        val prefs = context.getSharedPreferences("jwt", Context.MODE_PRIVATE)
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit()
-             .putString("jwt", _token)
+             .putString(JWT_KEY, _token)
              .apply()
     }
 
@@ -44,7 +46,7 @@ object UserRestController {
     }
 
     suspend fun register(userdata: UserData, context: Context) {
-        val result = api.login(constructJson(userdata))
+        val result = api.register(constructJson(userdata))
         if (result.isSuccessful) {
             _token = result.body()!!.token
             _user = result.body()!!.user
@@ -56,6 +58,6 @@ object UserRestController {
 
     private fun constructJson(userdata: UserData): RequestBody = RequestBody.create(
         JSON_TYPE,
-        """{"post": {${userdata.username?.let { "\"username\":$it," } ?: ""}"password": "${userdata.password}","email": "${userdata.email}"}}"""
+        """{"user": {${userdata.username?.let { "\"username\": \"$it\"," } ?: ""}"password": "${userdata.password}","email": "${userdata.email}"}}"""
     )
 }
