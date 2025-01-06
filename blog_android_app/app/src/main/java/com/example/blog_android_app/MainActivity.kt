@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val bottomNavBar = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
+        val bottomNavBar = findViewById<BottomNavigationView>(R.id.bottom_navigation_view)
 
         bottomNavBar.setOnItemSelectedListener { item ->
             when (item.itemId) {
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainer, fragment)
+            .replace(R.id.fragment_container, fragment)
             .commit()
     }
 }
