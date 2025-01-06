@@ -4,12 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class PostFeedAdapter(
     private val viewModel: PostListViewModel,
+    val navigator: MainActivity.Navigator,
     lifecycleOwner: LifecycleOwner
 ) : RecyclerView.Adapter<PostCardViewHolder>()
 {
@@ -29,7 +31,7 @@ class PostFeedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostCardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.post_card, parent, false)
-        return PostCardViewHolder(view)
+        return PostCardViewHolder(view, navigator)
     }
 
     override fun getItemCount(): Int = postList.size

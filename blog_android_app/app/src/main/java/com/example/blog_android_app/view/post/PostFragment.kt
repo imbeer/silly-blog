@@ -6,20 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
-import com.example.blog_android_app.view.feed.PostCardViewHolder
+import com.example.blog_android_app.repository.likes.LikeRestController
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 
 class PostFragment(
-    private val viewModel: CommentListViewModel
+    private val viewModel: CommentListViewModel,
+    val navigator: MainActivity.Navigator
 ) : Fragment() {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: CommentFeedAdapter
-    private lateinit var postCard: View
+    private lateinit var commentList: RecyclerView
+    private lateinit var commentFeedAdapter: CommentFeedAdapter
     private lateinit var searchBar: EditText
     private lateinit var searchButton: ImageButton
     private lateinit var editButton: ImageButton
@@ -27,17 +29,18 @@ class PostFragment(
     private lateinit var commentBar: EditText
     private lateinit var commentButton: ImageButton
 
+    private lateinit var likeNumber: TextView
+    private lateinit var likeButton: ImageButton
+    private lateinit var postTextContent: TextView
+    private lateinit var postOwnerUsername: TextView
+    // todo: add images
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.post_fragment, container, false)
-        recyclerView = view.findViewById(R.id.comment_list)
-
-        postCard = layoutInflater.inflate(R.layout.post_card, view.findViewById(R.id.post_card), false)
-        val viewHolder = PostCardViewHolder(postCard)
-        viewHolder.bind(viewModel.getPostData())
-
+        commentList = view.findViewById(R.id.comment_list)
         searchBar = view.findViewById(R.id.comment_search_bar)
         searchButton = view.findViewById(R.id.comment_search_button)
         editButton = view.findViewById(R.id.post_edit_button)
@@ -45,22 +48,34 @@ class PostFragment(
         commentBar = view.findViewById(R.id.comment_bar)
         commentButton = view.findViewById(R.id.comment_submit_button)
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        adapter = CommentFeedAdapter(viewModel, this.viewLifecycleOwner)
+
+
+        likeNumber = view.findViewById(R.id.like_number)
+        likeButton = view.findViewById(R.id.like)
+        postTextContent = view.findViewById(R.id.username)
+        postOwnerUsername = view.findViewById(R.id.text_content)
+
+        commentList.layoutManager = LinearLayoutManager(context)
+        commentFeedAdapter = CommentFeedAdapter(viewModel, this.viewLifecycleOwner)
+        commentList.adapter = commentFeedAdapter
         viewModel.loadData()
-        recyclerView.adapter = adapter
+
+        LikeHandler.setLikeButtonIcon(view.context, viewModel.getPostData().isLiked, likeButton)
+        LikeHandler.setLikeNumber(likeNumber, viewModel.getPostData())
+        postTextContent.text = viewModel.getPostData().textContent
+        postOwnerUsername.text = viewModel.getPostData().username
 
         hideControlButtons()
         showControlButtons()
 
-        recyclerView.addOnScrollListener (object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
+        commentList.addOnScrollListener (object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(commentList: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(commentList, dx, dy)
                 if (viewModel.isEnded() || viewModel.isLoading()) {
                     return
                 }
 
-                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val layoutManager = commentList.layoutManager as LinearLayoutManager
                 val visibleItemCount = layoutManager.childCount
                 val totalItemCount = layoutManager.itemCount
                 val firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition()
@@ -91,6 +106,12 @@ class PostFragment(
 
         commentButton.setOnClickListener {
             viewModel.createComment(text = commentBar.text.toString())
+        }
+
+        likeButton.setOnClickListener {
+            LikeRestController.chaneLikeStatus(viewModel.getPostData())
+            LikeHandler.setLikeButtonIcon(view.context, viewModel.getPostData().isLiked, likeButton)
+            LikeHandler.setLikeNumber(likeNumber, viewModel.getPostData())
         }
 
         // todo: edit post button.

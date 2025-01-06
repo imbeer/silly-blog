@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.viewmodel.PostEditViewModel
 
-class EditPostFragment(private val viewModel: PostEditViewModel) : Fragment() {
+class EditPostFragment(private val viewModel: PostEditViewModel, val navigator: MainActivity.Navigator) : Fragment() {
 
     private lateinit var editText: EditText
     private lateinit var submitButton: ImageButton

@@ -8,10 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
-class FeedFragment : Fragment() {
+class FeedFragment(val navigator: MainActivity.Navigator) : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PostFeedAdapter
@@ -25,7 +26,7 @@ class FeedFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         val viewModel = PostListViewModel()
 
-        adapter = PostFeedAdapter(viewModel, this.viewLifecycleOwner)
+        adapter = PostFeedAdapter(viewModel, navigator, this.viewLifecycleOwner)
         viewModel.loadData()
         recyclerView.adapter = adapter
 
