@@ -218,12 +218,12 @@ void PostController::addImagesToPost(
     }
 
     m_imageMapper.updateBy(
-        {"post_id"},
+        {drogon_model::blog::Image::Cols::_post_id},
         existingImagesCriteria,
         nullptr);
 
     m_imageMapper.updateBy(
-        {"post_id"},
+        {drogon_model::blog::Image::Cols::_post_id},
         imagesToAddCriteria,
         postId);
 }
