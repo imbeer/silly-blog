@@ -1,9 +1,9 @@
 package com.example.blog_android_app.repository.likes
 
 import com.example.blog_android_app.JSON_TYPE
-import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import com.example.blog_android_app.repository.users.UserRestController
 import kotlinx.coroutines.runBlocking
 import okhttp3.RequestBody
 
@@ -27,7 +27,7 @@ object LikeRestController {
         }
     }
 
-    private suspend fun likePost(token: String = TEST_JWT, postData: PostData) {
+    private suspend fun likePost(token: String = UserRestController.token.toString(), postData: PostData) {
         val response = api.likePost("Bearer $token", constructJson(postData))
         if (response.isSuccessful) {
             postData.isLiked = true
@@ -35,7 +35,7 @@ object LikeRestController {
         }
     }
 
-    private suspend fun unlikePost(token: String = TEST_JWT, postData: PostData) {
+    private suspend fun unlikePost(token: String = UserRestController.token.toString(), postData: PostData) {
         val response = api.unlikePost("Bearer $token", constructJson(postData))
         if (response.isSuccessful) {
             postData.isLiked = false
