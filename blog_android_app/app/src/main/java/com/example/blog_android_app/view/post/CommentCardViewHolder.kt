@@ -42,7 +42,7 @@ class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
         }
 
         editButton.setOnClickListener {
-            viewModel.update()
+            viewModel.setCurrentEditComment(commentData)
         }
     }
 }
