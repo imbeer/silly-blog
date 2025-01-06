@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.CommentData
 import com.example.blog_android_app.repository.comments.CommentRestController
+import com.example.blog_android_app.viewmodel.CommentListViewModel
 import kotlinx.coroutines.runBlocking
 
 class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -18,7 +19,7 @@ class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
     private val editButton = itemView.findViewById<ImageButton>(R.id.comment_edit_button)
     private val adminButtons = itemView.findViewById<LinearLayout>(R.id.admin_comment_buttons)
 
-    fun bind(commentData: CommentData) {
+    fun bind(commentData: CommentData, viewModel: CommentListViewModel) {
         textUsernameView.text = commentData.username
         textContentView.text = commentData.textContent
 
@@ -35,13 +36,13 @@ class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
                 val res = CommentRestController.deleteComment(commentData = commentData)
                 if (res) {
                     Toast.makeText(itemView.context, "Comment deleted!", Toast.LENGTH_SHORT).show()
-                    // todo: update list
+                    viewModel.update()
                 }
             }
         }
 
         editButton.setOnClickListener {
-            // todo: edit
+            viewModel.update()
         }
     }
 }
