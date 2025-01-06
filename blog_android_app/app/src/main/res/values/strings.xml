@@ -5,4 +5,9 @@
     <string name="empty_comment">empty_comment</string>
     <string name="type_username">type username</string>
     <string name="type_comment">type comment</string>
+    <string name="email">email</string>
+    <string name="password">password</string>
+    <string name="login">login</string>
+    <string name="register">REGISTER</string>
+    <string name="username">username</string>
 </resources>
