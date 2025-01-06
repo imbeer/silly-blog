@@ -21,7 +21,7 @@ class FeedFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.feed_fragment, container, false)
-        recyclerView = view.findViewById(R.id.recyclerView)
+        recyclerView = view.findViewById(R.id.post_recycler_view)
         recyclerView.layoutManager = LinearLayoutManager(context)
         val viewModel = PostListViewModel()
 

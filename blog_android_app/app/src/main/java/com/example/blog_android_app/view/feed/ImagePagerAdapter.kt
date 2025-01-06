@@ -12,7 +12,7 @@ class ImagePagerAdapter(private val bitmapList: MutableList<Bitmap?>) :
     RecyclerView.Adapter<ImagePagerAdapter.BitmapViewHolder>() {
 
     class BitmapViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val imageView: ImageView = itemView.findViewById(R.id.imageview)
+        val imageView: ImageView = itemView.findViewById(R.id.image_view)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BitmapViewHolder {
