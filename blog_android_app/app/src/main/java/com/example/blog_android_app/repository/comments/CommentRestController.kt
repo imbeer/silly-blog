@@ -1,9 +1,9 @@
 package com.example.blog_android_app.repository.comments
 
 import com.example.blog_android_app.JSON_TYPE
-import com.example.blog_android_app.TEST_JWT
 import com.example.blog_android_app.model.CommentData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import com.example.blog_android_app.repository.users.UserRestController
 import okhttp3.RequestBody
 
 object CommentRestController {
@@ -15,7 +15,7 @@ object CommentRestController {
     }
 
     suspend fun fetchComments(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         postId: Int,
         author: String = "",
         offset: Int,
@@ -25,7 +25,7 @@ object CommentRestController {
     }
 
     suspend fun createComment(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         commentData: CommentData
     ): CommentData? {
         val resp = api.createComment("Bearer $token", constructJson(commentData))
@@ -37,7 +37,7 @@ object CommentRestController {
     }
 
     suspend fun editComment(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         commentData: CommentData
     ): CommentData? {
         val resp = api.editComment("Bearer $token", constructJson(commentData))
@@ -49,7 +49,7 @@ object CommentRestController {
     }
 
     suspend fun deleteComment(
-        token: String = TEST_JWT,
+        token: String = UserRestController.token.toString(),
         commentData: CommentData
     ): Boolean {
         val resp = api.deleteComment("Bearer $token", constructJson(commentData))
