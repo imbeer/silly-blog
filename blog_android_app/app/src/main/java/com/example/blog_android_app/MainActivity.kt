@@ -1,6 +1,7 @@
 package com.example.blog_android_app
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -27,7 +28,11 @@ class MainActivity : AppCompatActivity() {
         bottomNavBar = findViewById(R.id.bottom_navigation_view)
 
         if (!UserRestController.isUserLoggedIn(context = applicationContext)) {
+            Log.d("LOGIN", "Not logged in")
             navigator.navigateToLoginFragment()
+        } else {
+            Log.d("LOGIN", "logged in")
+            loadFragment(FeedFragment(navigator = Navigator()))
         }
 
         bottomNavBar.setOnItemSelectedListener { item ->
@@ -47,8 +52,6 @@ class MainActivity : AppCompatActivity() {
                 else -> false
             }
         }
-
-        loadFragment(FeedFragment(navigator = Navigator()))
     }
 
     private fun loadFragment(fragment: Fragment) {
