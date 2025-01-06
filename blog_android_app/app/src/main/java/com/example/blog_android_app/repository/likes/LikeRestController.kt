@@ -29,12 +29,18 @@ object LikeRestController {
 
     private suspend fun likePost(token: String = TEST_JWT, postData: PostData) {
         val response = api.likePost("Bearer $token", constructJson(postData))
-        if (response.isSuccessful) postData.isLiked = true
+        if (response.isSuccessful) {
+            postData.isLiked = true
+            postData.likes++ // todo: get from backend
+        }
     }
 
     private suspend fun unlikePost(token: String = TEST_JWT, postData: PostData) {
         val response = api.unlikePost("Bearer $token", constructJson(postData))
-        if (response.isSuccessful) postData.isLiked = false
+        if (response.isSuccessful) {
+            postData.isLiked = false
+            postData.likes-- // todo: get from backend
+        }
     }
 
     private fun constructJson(postData: PostData): RequestBody =
