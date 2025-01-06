@@ -52,8 +52,8 @@ class PostFragment(
 
         likeNumber = view.findViewById(R.id.like_number)
         likeButton = view.findViewById(R.id.like)
-        postTextContent = view.findViewById(R.id.username)
-        postOwnerUsername = view.findViewById(R.id.text_content)
+        postTextContent = view.findViewById(R.id.text_content)
+        postOwnerUsername = view.findViewById(R.id.username)
 
         commentList.layoutManager = LinearLayoutManager(context)
         commentFeedAdapter = CommentFeedAdapter(viewModel, this.viewLifecycleOwner)
