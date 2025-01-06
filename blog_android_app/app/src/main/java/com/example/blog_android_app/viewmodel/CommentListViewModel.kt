@@ -22,18 +22,21 @@ class CommentListViewModel(
     fun getUsername(): String = username
     fun getPostData(): PostData = postData
 
+    private val _currentComment = MutableLiveData<CommentData>()
+    val currentComment: LiveData<CommentData> get() = _currentComment
+
     private val _comments = MutableLiveData<MutableList<CommentData>>()
     val comments: LiveData<MutableList<CommentData>> get() = _comments
-
-    init {
-        _comments.value = mutableListOf()
-    }
 
     private val _notifyItemRangeInserted = MutableLiveData<Pair<Int, Int>>()
     val notifyItemRangeInserted: LiveData<Pair<Int, Int>> get() = _notifyItemRangeInserted
 
-    private val _notifyDataSetChanged = MutableLiveData<Boolean>(false)
+    private val _notifyDataSetChanged = MutableLiveData(false)
     val notifyDataSetChanged: LiveData<Boolean> get() = _notifyDataSetChanged
+
+    init {
+        _comments.value = mutableListOf()
+    }
 
     private fun _notifyItemRangeInserted(startIndex: Int, count: Int) {
         _notifyItemRangeInserted.value = Pair(startIndex, count)
@@ -84,14 +87,28 @@ class CommentListViewModel(
         _notifyDataSetChanged()
     }
 
-    fun createComment(text: String) {
-        if (text.isEmpty()) {
-            return
+    fun sendComment() {
+        if (currentComment.value?.textContent.isNullOrEmpty()) {
+            if (currentComment.value?.commentId == null) {
+                return
+            } else {
+                runBlocking {
+                    CommentRestController.deleteComment(commentData = currentComment.value!!)
+                    _currentComment.value = null
+                }
+            }
         }
-        val commentData = CommentData(textContent = text, postId = postData.postId)
-        runBlocking {
-            CommentRestController.createComment(commentData = commentData)
+        if (currentComment.value!!.postId != null) {
+            runBlocking {
+                CommentRestController.editComment(commentData = currentComment.value!!)
+            }
+        } else {
+            _currentComment.value!!.postId = postData.postId
+            runBlocking {
+                CommentRestController.createComment(commentData = currentComment.value!!)
+            }
         }
+        _currentComment.value = CommentData(textContent = "")
         update()
     }
 
@@ -99,5 +116,13 @@ class CommentListViewModel(
         runBlocking {
             PostRestController.deletePost(post = postData)
         }
+    }
+
+    fun setText(text: String) {
+        currentComment.value?.textContent = text
+    }
+
+    fun setCurrentEditComment(commentData: CommentData) {
+        _currentComment.value = commentData
     }
 }
