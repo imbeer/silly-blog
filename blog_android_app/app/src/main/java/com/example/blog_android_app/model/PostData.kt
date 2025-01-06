@@ -7,7 +7,7 @@ data class PostData(
     @SerializedName("user_id") val userId: Int? = null,
     @SerializedName("text_content") var textContent: String = "",
     @SerializedName("author") val username: String = "",
-    val likes: Int = 0,
+    var likes: Int = 0,
     var isLiked: Boolean = false,
     var canBeEdited: Boolean = false,
     var images: List<Int>? = null,
