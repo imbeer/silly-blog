@@ -4,8 +4,10 @@ import android.content.Context
 import com.example.blog_android_app.JSON_TYPE
 import com.example.blog_android_app.JWT_KEY
 import com.example.blog_android_app.PREF_NAME
+import com.example.blog_android_app.USERID_KEY
 import com.example.blog_android_app.model.UserData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
+import kotlinx.coroutines.runBlocking
 import okhttp3.RequestBody
 
 object UserRestController {
@@ -24,13 +26,22 @@ object UserRestController {
     fun isUserLoggedIn(context: Context): Boolean {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         _token = prefs.getString(JWT_KEY, null)
-        return (token != null)
+        val userId: Int = prefs.getInt(USERID_KEY, -1)
+        if (token != null && userId > -1) {
+            runBlocking {
+                getUser(userId)
+            }
+            return true
+        } else {
+            return false
+        }
     }
 
     private fun setUserToken(context: Context) {
         val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
         prefs.edit()
              .putString(JWT_KEY, _token)
+             .putInt(USERID_KEY, user.userId!!)
              .apply()
     }
 
@@ -42,6 +53,13 @@ object UserRestController {
             setUserToken(context)
         } else {
             throw RuntimeException("Wrong data")
+        }
+    }
+
+    suspend fun getUser(id: Int) {
+        val result = api.getUser(id)
+        if (result.isSuccessful) {
+            _user = result.body()!!
         }
     }
 
