@@ -10,12 +10,15 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.TEST_USERNAME
 import com.example.blog_android_app.view.feed.PostFeedAdapter
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
-class ProfileFragment : Fragment() {
+class ProfileFragment(
+    val navigator: MainActivity.Navigator
+) : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: PostFeedAdapter
     private lateinit var username: TextView
@@ -31,11 +34,11 @@ class ProfileFragment : Fragment() {
         username = view.findViewById(R.id.profile_username)
         bio = view.findViewById(R.id.profile_bio)
         image = view.findViewById(R.id.profile_user_image)
-        recyclerView.layoutManager = LinearLayoutManager(context)
 
         val viewModel = PostListViewModel(username = TEST_USERNAME)
 
-        adapter = PostFeedAdapter(viewModel, this.viewLifecycleOwner)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        adapter = PostFeedAdapter(viewModel, navigator, this.viewLifecycleOwner)
         viewModel.loadData()
         recyclerView.adapter = adapter
         username.text = viewModel.getUsername()
