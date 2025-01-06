@@ -28,6 +28,8 @@ class EditPostFragment(private val viewModel: PostEditViewModel, val navigator: 
         attachButton = view.findViewById(R.id.attach_button)
         clearButton = view.findViewById(R.id.post_clear_button)
 
+        editText.setText(viewModel.getPostData().textContent)
+
         submitButton.setOnClickListener {
             submit()
         }
@@ -48,6 +50,7 @@ class EditPostFragment(private val viewModel: PostEditViewModel, val navigator: 
         }
         viewModel.changeText(editText.text.toString())
         viewModel.submit()
+        navigator.navigateToSelfProfile()
     }
     private fun clear() {
         editText.text.clear()

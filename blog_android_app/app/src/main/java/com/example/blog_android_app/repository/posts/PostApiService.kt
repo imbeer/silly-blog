@@ -8,6 +8,7 @@ import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Query
 
 interface PostApiService {
@@ -22,6 +23,12 @@ interface PostApiService {
 
     @POST("/posts")
     suspend fun createPost(
+        @Header("Authorization") token: String,
+        @Body json: RequestBody
+    ): Response<PostData>
+
+    @PUT("/posts")
+    suspend fun editPost(
         @Header("Authorization") token: String,
         @Body json: RequestBody
     ): Response<PostData>

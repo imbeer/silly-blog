@@ -43,6 +43,6 @@ class CommentFeedAdapter(
     override fun getItemCount(): Int = commentList.size
 
     override fun onBindViewHolder(holder: CommentCardViewHolder, position: Int) {
-        holder.bind(commentList[position])
+        holder.bind(commentList[position], viewModel)
     }
 }

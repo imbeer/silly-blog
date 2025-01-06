@@ -55,5 +55,16 @@ class MainActivity : AppCompatActivity() {
                 .addToBackStack(null)
                 .commit()
         }
+        fun navigateToPostEditFragment(postData: PostData) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, EditPostFragment(PostEditViewModel(postData), navigator))
+                .addToBackStack(null)
+                .commit()
+        }
+        fun navigateToSelfProfile() {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, ProfileFragment(navigator))
+                .commit()
+        }
     }
 }

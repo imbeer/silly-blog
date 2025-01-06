@@ -48,8 +48,6 @@ class PostFragment(
         commentBar = view.findViewById(R.id.comment_bar)
         commentButton = view.findViewById(R.id.comment_submit_button)
 
-
-
         likeNumber = view.findViewById(R.id.like_number)
         likeButton = view.findViewById(R.id.like)
         postTextContent = view.findViewById(R.id.text_content)
@@ -105,7 +103,10 @@ class PostFragment(
         }
 
         commentButton.setOnClickListener {
-            viewModel.createComment(text = commentBar.text.toString())
+            if (commentBar.text != null) {
+                viewModel.createComment(text = commentBar.text.toString())
+                commentBar.text = null
+            }
         }
 
         likeButton.setOnClickListener {
@@ -114,7 +115,9 @@ class PostFragment(
             LikeHandler.setLikeNumber(likeNumber, viewModel.getPostData())
         }
 
-        // todo: edit post button.
+        editButton.setOnClickListener {
+            navigator.navigateToPostEditFragment(viewModel.getPostData())
+        }
 
         return view
     }

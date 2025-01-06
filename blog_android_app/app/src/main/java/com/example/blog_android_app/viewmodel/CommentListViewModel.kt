@@ -69,6 +69,13 @@ class CommentListViewModel(
         }
     }
 
+    fun update() {
+        _comments.value?.clear()
+        endOfFeed = false
+        loadData()
+        _notifyDataSetChanged()
+    }
+
     fun search(author: String) {
         username = author
         _comments.value?.clear()
@@ -78,10 +85,14 @@ class CommentListViewModel(
     }
 
     fun createComment(text: String) {
+        if (text.isEmpty()) {
+            return
+        }
         val commentData = CommentData(textContent = text, postId = postData.postId)
         runBlocking {
             CommentRestController.createComment(commentData = commentData)
         }
+        update()
     }
 
     fun deletePost() {
