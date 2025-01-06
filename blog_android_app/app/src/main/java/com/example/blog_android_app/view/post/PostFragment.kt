@@ -66,6 +66,14 @@ class PostFragment(
         hideControlButtons()
         showControlButtons()
 
+        viewModel.currentComment.observe(this.viewLifecycleOwner) { commentData ->
+            if (commentData?.textContent != null) {
+                commentBar.setText(commentData.textContent)
+            } else {
+                commentBar.setText("")
+            }
+        }
+
         commentList.addOnScrollListener (object : RecyclerView.OnScrollListener() {
             override fun onScrolled(commentList: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(commentList, dx, dy)
@@ -104,7 +112,8 @@ class PostFragment(
 
         commentButton.setOnClickListener {
             if (commentBar.text != null) {
-                viewModel.createComment(text = commentBar.text.toString())
+                viewModel.setText(text = commentBar.text.toString())
+                viewModel.sendComment()
                 commentBar.text = null
             }
         }
