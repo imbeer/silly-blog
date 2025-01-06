@@ -36,6 +36,18 @@ object PostRestController {
         }
     }
 
+    suspend fun editPost(
+        token: String = TEST_JWT,
+        post: PostData
+    ): PostData? {
+        val resp = api.editPost("Bearer $token", constructJson(post))
+        return if (resp.isSuccessful) {
+            resp.body()
+        } else {
+            null
+        }
+    }
+
     suspend fun deletePost(
         token: String = TEST_JWT,
         post: PostData
