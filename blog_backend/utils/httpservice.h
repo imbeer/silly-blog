@@ -20,7 +20,7 @@ inline void sendImageByPath(
     try {
         (*callback)(HttpResponse::newFileResponse("./uploads/" + path, "", CT_IMAGE_JPG));
     } catch (const exception &e) {
-        (*callback)(HttpResponse::newHttpResponse(drogon::k400BadRequest, CT_NONE));
+        (*callback)(HttpResponse::newHttpResponse(drogon::k500InternalServerError, CT_NONE));
     }
 }
 

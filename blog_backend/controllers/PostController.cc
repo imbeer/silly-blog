@@ -89,7 +89,9 @@ void PostController::create(
         [callbackPtr, req, this](const drogon_model::blog::Post &post) {
             auto json = Json::Value();
             json["post"] = post.toJson();
-            addImagesToPost(req, post.getValueOfPostId());
+
+            // addPostImages(req, post.getValueOfPostId());
+
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
             (*callbackPtr)(response);
@@ -125,7 +127,7 @@ void PostController::update(
         post.setTextContent(editedPost.getValueOfTextContent());
         m_postMapper.update(post);
 
-        addImagesToPost(req, post.getValueOfPostId());
+        updatePostImages(req, post.getValueOfPostId());
 
         json["post"] = post.toJson();
         auto resp = HttpResponse::newHttpJsonResponse(json);
@@ -196,54 +198,45 @@ string PostController::getPostOwnerName(const int &userId)
     return user.getValueOfUsername();
 }
 
-void PostController::addImagesToPost(
+void PostController::updatePostImages(
     const HttpRequestPtr &req,
     const int &postId)
 {
     const auto imageIdVector = parseService::getImageIdVectorFromRequest(*req);
-    const string imageIdString = parseService::getImageIdListStringFromRequest(*req);
-    const string existingImagesSql = "update image set post_id = NULL where post_id = $1;";
-    const string imagesToUpdateSql = "update image set post_id = $1 where image_id in (" + imageIdString + ");";
-    const string check = "select count(*) from image where image_id in (" + imageIdString + ");";
+    vector<Image> imagesToUpdate;
+    vector<Image> existingImages;
 
-    if (imageIdString.empty()) {
-        cout << "empty" << endl;
-        return;
+    try {
+        existingImages = m_imageMapper.findBy(Criteria(
+            drogon_model::blog::Image::Cols::_post_id,
+            CompareOperator::EQ,
+            postId));
+    } catch (const DrogonDbException &e) {
+        cout << "error while finding existing images" << endl;
     }
 
-    auto dbClient = app().getDbClient();
-
-    auto errorHandler = [](const DrogonDbException &e) {
-        cout << e.base().what();
-    };
-
-    const auto updateImages = [&dbClient, &imagesToUpdateSql, &postId, &errorHandler]() {
-        *dbClient << imagesToUpdateSql << postId
-            >> [](const Result &r) { cout << "update: success" << endl; }
-            >> errorHandler;
-    };
-
-    const auto clearExistingImagesAndUpdateIfSuccess = [&dbClient, &existingImagesSql, &postId, &errorHandler, &updateImages]() {
-        *dbClient << existingImagesSql << postId
-            >> [&updateImages](const Result &r)
-            {
-                cout << "exist: success" << endl;
-                updateImages();
-            }
-            >> errorHandler;
-    };
-
-    *dbClient
-        << check
-        >> [imageIdVector, &clearExistingImagesAndUpdateIfSuccess](const Result &r)
-        {
-            if (r.empty()) {
-                throw runtime_error("empty result");
-            } else if (r[0]["count"].as<int>() != imageIdVector.size()) {
-                throw runtime_error("some images are missing");
-            }
-            clearExistingImagesAndUpdateIfSuccess();
+    for (const int id : imageIdVector) {
+        try {
+            const auto image = m_imageMapper.findByPrimaryKey(id);
+            imagesToUpdate.push_back(image);
+            cout << "added  image" << endl;
+        } catch (const DrogonDbException &e) {
+            cout << "no such image" << endl;
+            return;
         }
-        >> errorHandler;
+    }
 
+    if (!existingImages.empty()) {
+        for (auto image: existingImages) {
+            image.setPostIdToNull();
+            m_imageMapper.update(image);
+            cout << "cleared  image" << endl;
+        }
+    }
+
+    for (auto image: imagesToUpdate) {
+        image.setPostId(postId);
+        m_imageMapper.update(image);
+        cout << "updated  image" << endl;
+    }
 }

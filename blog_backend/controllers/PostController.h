@@ -38,7 +38,7 @@ public:
 private:
     Json::Value getImageIdsForPostId(const int &postId);
     string getPostOwnerName(const int &userId);
-    void addImagesToPost(
+    void updatePostImages(
         const HttpRequestPtr &req,
         const int &postId);
 
