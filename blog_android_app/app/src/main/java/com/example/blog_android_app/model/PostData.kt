@@ -13,3 +13,7 @@ data class PostData(
     var images: List<Int>? = null,
     val time: String? = null
 )
+
+data class PostDataFromJson(
+    @SerializedName("post") val post: PostData
+)

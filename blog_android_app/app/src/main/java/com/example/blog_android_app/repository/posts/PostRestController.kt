@@ -30,7 +30,7 @@ object PostRestController {
     ): PostData? {
         val resp = api.createPost("Bearer $token", constructJson(post))
         return if (resp.isSuccessful) {
-            resp.body()
+            resp.body()?.post
         } else {
             null
         }
@@ -42,7 +42,7 @@ object PostRestController {
     ): PostData? {
         val resp = api.editPost("Bearer $token", constructJson(post))
         return if (resp.isSuccessful) {
-            resp.body()
+            resp.body()?.post
         } else {
             null
         }
