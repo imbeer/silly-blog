@@ -58,4 +58,19 @@ inline std::vector<int> getImageIdVectorFromRequest(const HttpRequest &req) {
     return imageIdVector;
 }
 
+inline std::string getImageIdListStringFromRequest(const HttpRequest &req) {
+    auto imageIds = (*req.getJsonObject())["post"]["images"];
+    if (imageIds.empty()) return "";
+
+    std::string list;
+    for (const auto &id : imageIds) {
+        if (id.isInt() && id > 0) {
+            list += id.asString();
+            list += ",";
+        }
+    }
+    list[list.size()-1] = ' ';
+    return list;
+}
+
 };
