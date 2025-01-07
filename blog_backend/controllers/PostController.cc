@@ -34,9 +34,9 @@ void PostController::get(
     }
 
     const auto posts = m_postMapper
-                           .orderBy(drogon_model::blog::Post::Cols::_time)
                            .limit(limit)
                            .offset(offset)
+                           .orderBy(drogon_model::blog::Post::Cols::_time, SortOrder::DESC)
                            .findBy(promptCriteria && ownerCriteria);
 
     const auto currentUser = jwtService::getCurrentUserFromRequest(req);
@@ -89,7 +89,7 @@ void PostController::create(
         [callbackPtr, req, this](const drogon_model::blog::Post &post) {
             auto json = Json::Value();
             json["post"] = post.toJson();
-            addImagesToPost(req, post.getValueOfPostId());
+            // addImagesToPost(req, post.getValueOfPostId());
             auto response = HttpResponse::newHttpJsonResponse(json);
             response->setStatusCode(HttpStatusCode::k201Created);
             (*callbackPtr)(response);
@@ -168,6 +168,7 @@ void PostController::remove(
         m_postMapper.deleteByPrimaryKey(postId);
         httpService::sendEmptyResponse(callbackPtr, k204NoContent);
     } catch (const std::exception &e) {
+        cout << e.what() << endl;
         httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
     }
 }
@@ -200,7 +201,11 @@ void PostController::addImagesToPost(
     const int &postId)
 {
     auto imageIds = parseService::getImageIdVectorFromRequest(*req);
-    if (imageIds.empty()) return;
+
+    if (imageIds.empty()) {
+        cout << "empty" << endl;
+        return;
+    }
 
     const auto existingImagesCriteria = Criteria(
         drogon_model::blog::Image::Cols::_post_id,
@@ -211,9 +216,17 @@ void PostController::addImagesToPost(
         CompareOperator::In,
         imageIds);
 
-    for (const auto &image : m_imageMapper.findBy(imagesToAddCriteria)) {
-        if (image.getPostId() != nullptr && image.getValueOfPostId() != postId) {
+    vector<Image> images;
+
+    images = m_imageMapper.findBy(imagesToAddCriteria);
+    cout << "find successfully" << endl;
+
+
+    for (const auto &image : images) {
+        if ((image.getPostId() != nullptr || image.getValueOfPostId() != -1) && image.getValueOfPostId() != postId) {
             throw runtime_error("Forbiden");
+        } else {
+            cout << "ok" << endl;
         }
     }
 
@@ -223,7 +236,7 @@ void PostController::addImagesToPost(
         nullptr);
 
     m_imageMapper.updateBy(
-        {drogon_model::blog::Image::Cols::_post_id},
-        imagesToAddCriteria,
-        postId);
-}
+       {drogon_model::blog::Image::Cols::_post_id},
+       imagesToAddCriteria,
+       postId);
+    }
