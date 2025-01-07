@@ -77,7 +77,7 @@ class EditPostFragment(
         }
         viewModel.changeText(editText.text.toString())
         viewModel.submit(lifecycleScope = lifecycleScope, context = requireContext())
-//        navigator.navigateToSelfProfile()
+        navigator.navigateToSelfProfile()
     }
     private fun clear() {
         editText.text.clear()

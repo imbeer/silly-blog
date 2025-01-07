@@ -79,11 +79,7 @@ class PostEditViewModel(private var postData: PostData) {
                     PostRestController.editPost(post = postData)
                 } else {
                     val createdPost = PostRestController.createPost(post = postData)
-                    if (createdPost == null) {
-                        Log.e("Created Post", "is null")
-                    }
                     if (createdPost != null && images.isNotEmpty()) {
-                        Log.d("Created Post", "not null")
                         createdPost.images = images
                         PostRestController.editPost(post = createdPost)
                     }
