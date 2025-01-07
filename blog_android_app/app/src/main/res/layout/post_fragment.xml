@@ -127,7 +127,7 @@
             android:layout_margin="8dp"
             android:background="@drawable/post_card_bg"
             android:padding="10dp"
-            android:src="@drawable/check"
+            android:src="@drawable/check_active"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toRightOf="@id/comment_bar"
             app:layout_constraintRight_toRightOf="parent"

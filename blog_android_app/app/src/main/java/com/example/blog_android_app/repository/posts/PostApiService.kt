@@ -1,6 +1,7 @@
 package com.example.blog_android_app.repository.posts
 
 import com.example.blog_android_app.model.PostData
+import com.example.blog_android_app.model.PostDataFromJson
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
@@ -25,13 +26,13 @@ interface PostApiService {
     suspend fun createPost(
         @Header("Authorization") token: String,
         @Body json: RequestBody
-    ): Response<PostData>
+    ): Response<PostDataFromJson>
 
     @PUT("/posts")
     suspend fun editPost(
         @Header("Authorization") token: String,
         @Body json: RequestBody
-    ): Response<PostData>
+    ): Response<PostDataFromJson>
 
     @HTTP(method = "DELETE", path = "/posts", hasBody = true)
     suspend fun deletePost(

@@ -12,3 +12,4 @@ const val DEFAULT_POSTS_LOAD_LIMIT = 10
 const val DEFAULT_POSTS_WHEN_TO_LOAD = 3
 const val DEFAULT_COMMENT_LOAD_LIMIT = 10
 val JSON_TYPE = MediaType.parse("application/json; charset=utf-8")
+val MEDIA_TYPE = MediaType.parse("image/*")
