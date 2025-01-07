@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.converter)
     implementation(libs.gson)
     implementation(libs.interceptor)
+    implementation(libs.glide)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
