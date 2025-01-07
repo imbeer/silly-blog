@@ -1,7 +1,11 @@
 package com.example.blog_android_app.repository.images
 
 import android.util.Log
+import android.widget.ImageView
+import com.bumptech.glide.Glide
+import com.example.blog_android_app.BASE_URL
 import com.example.blog_android_app.MEDIA_TYPE
+import com.example.blog_android_app.R
 import com.example.blog_android_app.repository.connection.RetrofitInstance
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -30,5 +34,14 @@ object ImageRestController {
             Log.e("UPLOAD", "Error: ${e.message}")
             throw e
         }
+    }
+
+    fun downloadImage(imageView: ImageView, imageId: Int) {
+        val url = BASE_URL + "image?image_id=$imageId"
+        Glide.with(imageView.context)
+            .load(url)
+            .placeholder(R.drawable.placeholder_load)
+            .error(R.drawable.placeholder_error)
+            .into(imageView)
     }
 }
