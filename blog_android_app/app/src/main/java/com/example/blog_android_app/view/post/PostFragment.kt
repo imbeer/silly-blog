@@ -54,7 +54,7 @@ class PostFragment(
         postOwnerUsername = view.findViewById(R.id.username)
 
         commentList.layoutManager = LinearLayoutManager(context)
-        commentFeedAdapter = CommentFeedAdapter(viewModel, this.viewLifecycleOwner)
+        commentFeedAdapter = CommentFeedAdapter(viewModel, viewLifecycleOwner)
         commentList.adapter = commentFeedAdapter
         viewModel.loadData()
 
@@ -66,12 +66,15 @@ class PostFragment(
         hideControlButtons()
         showControlButtons()
 
-        viewModel.currentComment.observe(this.viewLifecycleOwner) { commentData ->
+        viewModel.currentComment.observe(viewLifecycleOwner) { commentData ->
             if (commentData?.textContent != null) {
                 commentBar.setText(commentData.textContent)
-            } else {
-                commentBar.setText("")
             }
+        }
+
+
+        viewModel.notifyDataSetChanged.observe(viewLifecycleOwner) {
+            commentList.scrollToPosition(0)
         }
 
         commentList.addOnScrollListener (object : RecyclerView.OnScrollListener() {
@@ -112,8 +115,7 @@ class PostFragment(
 
         commentButton.setOnClickListener {
             if (commentBar.text != null) {
-                viewModel.setText(text = commentBar.text.toString())
-                viewModel.sendComment()
+                viewModel.sendComment(text = commentBar.text.toString())
                 commentBar.text = null
             }
         }
