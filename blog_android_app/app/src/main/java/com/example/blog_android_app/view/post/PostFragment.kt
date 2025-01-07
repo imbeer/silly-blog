@@ -10,10 +10,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.repository.likes.LikeRestController
+import com.example.blog_android_app.view.feed.ImagePagerAdapter
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 
 class PostFragment(
@@ -33,6 +35,7 @@ class PostFragment(
     private lateinit var likeButton: ImageButton
     private lateinit var postTextContent: TextView
     private lateinit var postOwnerUsername: TextView
+    private lateinit var viewPager: ViewPager2
     // todo: add images
 
     override fun onCreateView(
@@ -52,6 +55,14 @@ class PostFragment(
         likeButton = view.findViewById(R.id.like)
         postTextContent = view.findViewById(R.id.text_content)
         postOwnerUsername = view.findViewById(R.id.username)
+        viewPager = view.findViewById(R.id.image_viewpager)
+
+        if (viewModel.getPostData().images.isNullOrEmpty()) {
+            viewPager.visibility = View.GONE
+        } else {
+            viewPager.adapter = ImagePagerAdapter(viewModel.getPostData().images!!)
+            viewPager.visibility = View.VISIBLE
+        }
 
         commentList.layoutManager = LinearLayoutManager(context)
         commentFeedAdapter = CommentFeedAdapter(viewModel, viewLifecycleOwner)
@@ -107,6 +118,7 @@ class PostFragment(
 
         clearButton.setOnClickListener {
             viewModel.deletePost()
+            navigator.navigateToSelfProfile()
         }
 
         searchButton.setOnClickListener {

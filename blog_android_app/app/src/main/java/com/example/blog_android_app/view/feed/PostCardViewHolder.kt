@@ -29,11 +29,12 @@ class PostCardViewHolder(
         LikeHandler.setLikeNumber(likeNumber, postData)
         viewPager.visibility = View.GONE
 
-//        if (postData.images.isNullOrEmpty()) {
-//            viewPager.visibility = View.GONE
-//        } else {
-//            viewPager.adapter = ImagePagerAdapter(downloadBitmaps(postData.images))
-//        }
+        if (postData.images.isNullOrEmpty()) {
+            viewPager.visibility = View.GONE
+        } else {
+            viewPager.adapter = ImagePagerAdapter(postData.images!!)
+            viewPager.visibility = View.VISIBLE
+        }
 
         likeButton.setOnClickListener {
             LikeRestController.chaneLikeStatus(postData)
