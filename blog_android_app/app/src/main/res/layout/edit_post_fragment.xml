@@ -32,7 +32,7 @@
             android:layout_margin="16dp"
             android:padding="16dp"
             android:background="@drawable/post_card_bg"
-            android:src="@drawable/check" />
+            android:src="@drawable/check_active" />
         <ImageButton
             android:id="@+id/attach_button"
             android:layout_width="wrap_content"
