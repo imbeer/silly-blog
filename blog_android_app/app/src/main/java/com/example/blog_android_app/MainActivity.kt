@@ -86,6 +86,12 @@ class MainActivity : AppCompatActivity() {
             hideBottomNavBar()
         }
 
+        fun navigateToFeedFragment() {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, FeedFragment(navigator))
+                .commit()
+        }
+
         fun showBottomNavBar() {
             bottomNavBar.visibility = View.VISIBLE
         }

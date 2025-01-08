@@ -73,7 +73,7 @@ class EditPostFragment(
         viewModel.imagesChanged.observe(viewLifecycleOwner) { imageChanged ->
             if (imageChanged) {
                 Toast.makeText(context, "Image added successfully!", Toast.LENGTH_SHORT).show()
-                navigator.navigateToSelfProfile()
+//                navigator.navigateToSelfProfile()
             } else {
 //                Toast.makeText(context, "Image too big or server error", Toast.LENGTH_SHORT).show()
             }
