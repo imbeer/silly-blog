@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.viewmodel.PostEditViewModel
@@ -26,6 +28,8 @@ class EditPostFragment(
     private lateinit var submitButton: ImageButton
     private lateinit var attachButton: ImageButton
     private lateinit var clearButton: ImageButton
+
+    private lateinit var imageList: RecyclerView
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -57,6 +61,24 @@ class EditPostFragment(
             }
         }
 
+        viewModel.deleted.observe(viewLifecycleOwner) { deleted ->
+            if (deleted) {
+                Toast.makeText(context, "Deleted successfully!", Toast.LENGTH_SHORT).show()
+                navigator.navigateToSelfProfile()
+            } else {
+//                Toast.makeText(context, "Not deleted", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        viewModel.imagesChanged.observe(viewLifecycleOwner) { imageChanged ->
+            if (imageChanged) {
+                Toast.makeText(context, "Image added successfully!", Toast.LENGTH_SHORT).show()
+                navigator.navigateToSelfProfile()
+            } else {
+//                Toast.makeText(context, "Image too big or server error", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         submitButton.setOnClickListener {
             submit()
         }
@@ -81,7 +103,7 @@ class EditPostFragment(
     }
     private fun clear() {
         editText.text.clear()
-        viewModel.clear()
+        viewModel.clear(lifecycleScope = lifecycleScope)
     }
     private fun attach() {
         pickImageLauncher.launch("image/*")

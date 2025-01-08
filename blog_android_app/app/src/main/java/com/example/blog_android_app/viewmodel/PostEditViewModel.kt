@@ -19,6 +19,12 @@ class PostEditViewModel(private var postData: PostData) {
     private val _isLoading = MutableLiveData(false)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
+    private val _deleted = MutableLiveData(false)
+    val deleted: LiveData<Boolean> get() = _deleted
+
+    private val _imagesChanged = MutableLiveData(false)
+    val imagesChanged: LiveData<Boolean> get() = _imagesChanged
+
     fun getPostData() = postData
 
     fun changeText(text: String) {
@@ -27,12 +33,14 @@ class PostEditViewModel(private var postData: PostData) {
 
     fun addImage(imageId: Int) {
         images.add(imageId)
+        _imagesChanged.value = true
     }
 
-    fun addFile(uri: Uri, context: Context, lifecycleScope :LifecycleCoroutineScope) {
+    fun addFile(uri: Uri, context: Context, lifecycleScope: LifecycleCoroutineScope) {
         val fileSize = getFileSize(uri, context)
         if (fileSize == null || fileSize >= 1_048_576) {
             Log.d("GalleryFragment", "File not accepted: $fileSize bytes")
+            _imagesChanged.value = false
             return
         }
         val tempFile = File.createTempFile("temp_image", null)
@@ -44,8 +52,11 @@ class PostEditViewModel(private var postData: PostData) {
         lifecycleScope.launch(Dispatchers.Default) {
             val resultId = ImageRestController.uploadImage(tempFile)
             withContext(Dispatchers.Main) {
-                resultId?.let {
-                    images.add(it)
+                if (resultId != null) {
+                    images.add(resultId)
+                    _imagesChanged.value = true
+                } else {
+                    _imagesChanged.value = false
                 }
                 _isLoading.value = false
             }
@@ -93,8 +104,22 @@ class PostEditViewModel(private var postData: PostData) {
         }
     }
 
-    fun clear() {
+    fun clear(lifecycleScope: LifecycleCoroutineScope) {
+        if (postData.postId != null){
+            lifecycleScope.launch {
+                if (PostRestController.deletePost(post = postData))
+                    withContext(Dispatchers.Main) {
+                        _deleted.value = true
+                    }
+                else {
+                    withContext(Dispatchers.Main) {
+                        _deleted.value = false
+                    }
+                }
+            }
+        }
         images.clear()
+        _imagesChanged.value = true
         postData.images = images
         postData.textContent = ""
     }
