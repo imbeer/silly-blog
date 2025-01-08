@@ -41,7 +41,8 @@ class ProfileFragment(
         adapter = PostFeedAdapter(viewModel, navigator, this.viewLifecycleOwner)
         viewModel.loadData()
         recyclerView.adapter = adapter
-        username.text = viewModel.getUsername()
+        username.text = UserRestController.user.username
+        bio.text = UserRestController.user.bio
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
