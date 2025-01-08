@@ -1,6 +1,5 @@
 package com.example.blog_android_app.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -90,7 +89,6 @@ class CommentListViewModel(
     }
 
     fun sendComment(text: String) {
-        Log.d("whatthefuck", "sending comment")
         val newComment = _currentComment.value!!.copy(textContent = text)
         _currentComment.value = newComment
 

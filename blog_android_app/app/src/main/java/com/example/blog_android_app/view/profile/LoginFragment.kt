@@ -69,7 +69,7 @@ class LoginFragment(
                         context = requireContext()
                     )
                     if (res) {
-                        navigator.navigateToSelfProfile()
+                        navigator.navigateToFeedFragment()
                         navigator.showBottomNavBar()
                     }
                 }
