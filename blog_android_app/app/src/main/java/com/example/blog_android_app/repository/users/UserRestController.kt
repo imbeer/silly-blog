@@ -1,14 +1,18 @@
 package com.example.blog_android_app.repository.users
 
 import android.content.Context
+import android.util.Log
 import com.example.blog_android_app.JSON_TYPE
 import com.example.blog_android_app.JWT_KEY
+import com.example.blog_android_app.MEDIA_TYPE
 import com.example.blog_android_app.PREF_NAME
 import com.example.blog_android_app.USERID_KEY
 import com.example.blog_android_app.model.UserData
 import com.example.blog_android_app.repository.connection.RetrofitInstance
 import kotlinx.coroutines.runBlocking
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.io.File
 
 object UserRestController {
     private val api: UserApiService
@@ -45,6 +49,14 @@ object UserRestController {
              .apply()
     }
 
+    fun logout(context: Context) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit()
+            .putString(JWT_KEY, null)
+            .putInt(USERID_KEY, -1)
+            .apply()
+    }
+
     suspend fun login(userdata: UserData, context: Context) {
         val result = api.login(constructJson(userdata))
         if (result.isSuccessful) {
@@ -79,6 +91,32 @@ object UserRestController {
         } else {
             throw RuntimeException("Wrong data")
         }
+    }
+
+    suspend fun uploadImage(file: File) {
+        try {
+            val requestFile = RequestBody.create(
+                MEDIA_TYPE,
+                file
+            )
+            val body = MultipartBody.Part.createFormData("image", file.name, requestFile)
+            val response = api.setImage("Bearer $token", body)
+            Log.d("UPLOAD", "Response: $response")
+        } catch (e: Exception) {
+            Log.e("UPLOAD", "Error: ${e.message}")
+            throw e
+        }
+    }
+
+    suspend fun updateUser(userdata: UserData): Boolean {
+        val resp = api.updateUser("Bearer $token",
+            constructJson(userdata)
+        )
+        return resp.isSuccessful
+    }
+
+    suspend fun deleteUser() {
+        api.deleteUser("Bearer $token")
     }
 
     private fun constructJson(userdata: UserData): RequestBody = RequestBody.create(
