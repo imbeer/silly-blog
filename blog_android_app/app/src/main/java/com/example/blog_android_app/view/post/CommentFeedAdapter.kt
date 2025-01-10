@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.CommentData
 import com.example.blog_android_app.viewmodel.CommentListViewModel
@@ -12,6 +13,7 @@ import com.example.blog_android_app.viewmodel.CommentListViewModel
 @SuppressLint("NotifyDataSetChanged")
 class CommentFeedAdapter(
     private val viewModel: CommentListViewModel,
+    private val navigator: MainActivity.Navigator,
     lifecycleOwner: LifecycleOwner
 ): RecyclerView.Adapter<CommentCardViewHolder>() {
 
@@ -38,7 +40,7 @@ class CommentFeedAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CommentCardViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val view = inflater.inflate(R.layout.comment_card, parent, false)
-        return CommentCardViewHolder(view)
+        return CommentCardViewHolder(view, navigator = navigator)
     }
 
     override fun getItemCount(): Int = commentList.size
