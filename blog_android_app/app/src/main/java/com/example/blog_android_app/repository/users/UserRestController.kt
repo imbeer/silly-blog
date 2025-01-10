@@ -29,7 +29,7 @@ object UserRestController {
         val userId: Int = prefs.getInt(USERID_KEY, -1)
         if (token != null && userId > -1) {
             runBlocking {
-                getUser(userId)
+                getCurrentUser(userId)
             }
             return true
         } else {
@@ -56,11 +56,18 @@ object UserRestController {
         }
     }
 
-    suspend fun getUser(id: Int) {
+    suspend fun getCurrentUser(id: Int) {
         val result = api.getUser(id)
         if (result.isSuccessful) {
             _user = result.body()!!
         }
+    }
+
+    suspend fun getUser(id: Int): UserData? {
+        val result = api.getUser(id)
+        return if (result.isSuccessful) {
+            result.body()!!
+        } else null
     }
 
     suspend fun register(userdata: UserData, context: Context) {

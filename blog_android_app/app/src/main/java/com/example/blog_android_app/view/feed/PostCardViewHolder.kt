@@ -1,15 +1,19 @@
 package com.example.blog_android_app.view.feed
 
+import android.util.Log
 import android.view.View
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.likes.LikeRestController
+import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.view.post.LikeHandler
+import kotlinx.coroutines.runBlocking
 
 class PostCardViewHolder(
     private val itemView: View,
@@ -44,6 +48,19 @@ class PostCardViewHolder(
 
         itemView.setOnClickListener {
             navigator.navigateToPostFragment(postData)
+        }
+
+        textUsernameView.setOnClickListener {
+            val userId = postData.userId
+            Log.d("NAVIGATE TO USER PROF", postData.userId.toString())
+            runBlocking {
+                val user = UserRestController.getUser(userId!!)
+                if (user != null)
+                    navigator.navigateToUserProfile(user)
+                else {
+                    Toast.makeText(itemView.context, "User is gone", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }

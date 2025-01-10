@@ -67,7 +67,7 @@ class PostFragment(
         }
 
         commentList.layoutManager = LinearLayoutManager(context)
-        commentFeedAdapter = CommentFeedAdapter(viewModel, viewLifecycleOwner)
+        commentFeedAdapter = CommentFeedAdapter(viewModel, navigator, viewLifecycleOwner)
         commentList.adapter = commentFeedAdapter
         viewModel.loadData()
 
@@ -84,7 +84,6 @@ class PostFragment(
                 commentBar.setText(commentData.textContent)
             }
         }
-
 
         viewModel.notifyDataSetChanged.observe(viewLifecycleOwner) {
             commentList.scrollToPosition(0)

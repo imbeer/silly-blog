@@ -6,13 +6,18 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.CommentData
 import com.example.blog_android_app.repository.comments.CommentRestController
+import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 import kotlinx.coroutines.runBlocking
 
-class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class CommentCardViewHolder(
+    private val itemView: View,
+    private val navigator: MainActivity.Navigator
+) : RecyclerView.ViewHolder(itemView) {
     private val textUsernameView = itemView.findViewById<TextView>(R.id.comment_username)
     private val textContentView = itemView.findViewById<TextView>(R.id.comment_text)
     private val clearButton = itemView.findViewById<ImageButton>(R.id.comment_clear_button)
@@ -43,6 +48,18 @@ class CommentCardViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) 
 
         editButton.setOnClickListener {
             viewModel.setCurrentEditComment(commentData)
+        }
+
+        textUsernameView.setOnClickListener {
+            val userId = commentData.userId
+            runBlocking {
+                val user = UserRestController.getUser(userId!!)
+                if (user != null)
+                    navigator.navigateToUserProfile(user)
+                else {
+                    Toast.makeText(itemView.context, "User is gone", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 }
