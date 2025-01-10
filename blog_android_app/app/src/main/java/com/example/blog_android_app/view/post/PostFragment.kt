@@ -19,6 +19,8 @@ import com.example.blog_android_app.R
 import com.example.blog_android_app.repository.likes.LikeRestController
 import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.view.feed.ImagePagerAdapter
+import com.example.blog_android_app.view.list.CommentFeedAdapter
+import com.example.blog_android_app.view.list.LikeHandler
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 import kotlinx.coroutines.runBlocking
 

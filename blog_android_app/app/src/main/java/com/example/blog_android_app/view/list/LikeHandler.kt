@@ -1,4 +1,4 @@
-package com.example.blog_android_app.view.post
+package com.example.blog_android_app.view.list
 
 import android.content.Context
 import android.widget.ImageButton

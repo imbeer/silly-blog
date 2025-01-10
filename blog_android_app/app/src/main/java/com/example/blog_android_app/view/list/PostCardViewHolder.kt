@@ -1,4 +1,4 @@
-package com.example.blog_android_app.view.feed
+package com.example.blog_android_app.view.list
 
 import android.util.Log
 import android.view.View
@@ -12,7 +12,7 @@ import com.example.blog_android_app.R
 import com.example.blog_android_app.model.PostData
 import com.example.blog_android_app.repository.likes.LikeRestController
 import com.example.blog_android_app.repository.users.UserRestController
-import com.example.blog_android_app.view.post.LikeHandler
+import com.example.blog_android_app.view.feed.ImagePagerAdapter
 import kotlinx.coroutines.runBlocking
 
 class PostCardViewHolder(
