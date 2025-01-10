@@ -110,9 +110,7 @@ object UserRestController {
     }
 
     suspend fun updateUser(userdata: UserData): Boolean {
-        val resp = api.updateUser("Bearer $token",
-            constructJson(userdata)
-        )
+        val resp = api.updateUser("Bearer $token", constructJson(userdata))
         getCurrentUser(user.userId!!)
         return resp.isSuccessful
     }
@@ -125,5 +123,10 @@ object UserRestController {
     private fun constructJson(userdata: UserData): RequestBody = RequestBody.create(
         JSON_TYPE,
         """{"user": {${userdata.username?.let { "\"username\": \"$it\"," } ?: ""}"password": "${userdata.password}","email": "${userdata.email}"}}"""
+    )
+
+    private fun constructEditJson(userdata: UserData): RequestBody = RequestBody.create(
+        JSON_TYPE,
+        """{"user": {${userdata.username?.let { "\"username\": \"$it\"," } ?: ""}"bio": "${userdata.bio}","password": "${userdata.password}"}}"""
     )
 }

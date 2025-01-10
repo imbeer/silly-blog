@@ -26,6 +26,7 @@ class EditProfileFragment(
     private lateinit var pictureButton: ImageButton
     private lateinit var nameEdit: EditText
     private lateinit var bioEdit: EditText
+    private lateinit var passwordEdit: EditText
 
     private val pickImageLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         uri?.let {
@@ -45,6 +46,7 @@ class EditProfileFragment(
         pictureButton = view.findViewById(R.id.edit_profile_picture_button)
         nameEdit = view.findViewById(R.id.edit_username_text)
         bioEdit = view.findViewById(R.id.edit_bio_text)
+        passwordEdit = view.findViewById(R.id.edit_password_text)
         updateView()
 
         viewModel.imagesChanged.observe(viewLifecycleOwner) { imageChanged ->
@@ -79,13 +81,13 @@ class EditProfileFragment(
         return view
     }
 
-    fun updateView() {
+    private fun updateView() {
         nameEdit.setText(viewModel.userData.username)
         bioEdit.setText(viewModel.userData.bio)
     }
 
-    fun submit() {
-        viewModel.submit(bioEdit.text.toString(), nameEdit.text.toString(), requireContext(), lifecycleScope)
+    private fun submit() {
+        viewModel.submit(bioEdit.text.toString(), nameEdit.text.toString(), passwordEdit.text.toString(), requireContext(), lifecycleScope)
         updateView()
     }
 }
