@@ -110,6 +110,13 @@ class CommentListViewModel(
         update()
     }
 
+    fun deleteComment(commentData: CommentData) {
+        runBlocking {
+            CommentRestController.deleteComment(commentData = commentData)
+        }
+        update()
+    }
+
 
     fun deletePost() {
         runBlocking {

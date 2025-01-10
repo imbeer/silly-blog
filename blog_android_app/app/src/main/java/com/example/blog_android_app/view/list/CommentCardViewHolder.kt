@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.model.CommentData
-import com.example.blog_android_app.repository.comments.CommentRestController
 import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 import kotlinx.coroutines.runBlocking
@@ -37,13 +36,7 @@ class CommentCardViewHolder(
         }
 
         clearButton.setOnClickListener {
-            runBlocking {
-                val res = CommentRestController.deleteComment(commentData = commentData)
-                if (res) {
-                    Toast.makeText(itemView.context, "Comment deleted!", Toast.LENGTH_SHORT).show()
-                    viewModel.update()
-                }
-            }
+            viewModel.deleteComment(commentData)
         }
 
         editButton.setOnClickListener {
