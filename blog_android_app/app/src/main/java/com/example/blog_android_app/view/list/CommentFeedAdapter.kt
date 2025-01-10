@@ -29,10 +29,8 @@ class CommentFeedAdapter(
             notifyItemRangeInserted(range.first, range.second)
         }
 
-        // used only when searching (all dataset changed)
         viewModel.notifyDataSetChanged.observe(lifecycleOwner) {
             notifyDataSetChanged()
-
         }
     }
 

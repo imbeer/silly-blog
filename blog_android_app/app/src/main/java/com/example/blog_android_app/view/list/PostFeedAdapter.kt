@@ -26,6 +26,9 @@ class PostFeedAdapter(
         viewModel.notifyItemRangeInserted.observe(lifecycleOwner) { range ->
             notifyItemRangeInserted(range.first, range.second)
         }
+        viewModel.notifyDataSetChanged.observe(lifecycleOwner) {
+            notifyDataSetChanged()
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostCardViewHolder {

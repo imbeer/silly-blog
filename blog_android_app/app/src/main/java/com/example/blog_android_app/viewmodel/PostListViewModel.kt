@@ -19,28 +19,6 @@ class PostListViewModel(
 
     private var loading = false
     private var endOfFeed = false
-    fun isLoading():Boolean = loading
-    fun isEnded(): Boolean = endOfFeed
-    fun getUsername(): String? = user.username
-    fun getPrompt(): String = searchPrompt
-    fun setPrompt(prompt: String = "") {
-        searchPrompt = prompt
-        _posts.value!!.clear()
-        loadData()
-        notifyDataSetChanged
-    }
-
-    private var sort: Int = TIME_SORT
-    fun getSort() = sort
-    fun setSort(type: Int = TIME_SORT) {
-        if (sort == type) {
-            return
-        }
-        sort = type
-        _posts.value!!.clear()
-        loadData()
-        notifyDataSetChanged
-    }
 
     private val _posts = MutableLiveData<MutableList<PostData>>()
     val posts: LiveData<MutableList<PostData>> get() = _posts
@@ -61,6 +39,25 @@ class PostListViewModel(
 
     init {
         _posts.value = mutableListOf()
+    }
+
+    fun isLoading():Boolean = loading
+    fun isEnded(): Boolean = endOfFeed
+    fun getUsername(): String? = user.username
+    fun getPrompt(): String = searchPrompt
+    fun setPrompt(prompt: String = "") {
+        searchPrompt = prompt
+        update()
+    }
+
+    private var sort: Int = TIME_SORT
+    fun getSort() = sort
+    fun setSort(type: Int = TIME_SORT) {
+        if (sort == type) {
+            return
+        }
+        sort = type
+        update()
     }
 
     private fun addPosts(newPosts: List<PostData>) {
@@ -89,5 +86,13 @@ class PostListViewModel(
             }
             loading = false
         }
+    }
+
+    fun update() {
+        _posts.value!!.clear()
+        endOfFeed = false
+        _notifyDataSetChanged()
+        loadData()
+        _notifyDataSetChanged()
     }
 }
