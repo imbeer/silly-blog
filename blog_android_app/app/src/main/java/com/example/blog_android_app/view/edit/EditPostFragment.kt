@@ -65,17 +65,12 @@ class EditPostFragment(
             if (deleted) {
                 Toast.makeText(context, "Deleted successfully!", Toast.LENGTH_SHORT).show()
                 navigator.navigateToSelfProfile()
-            } else {
-//                Toast.makeText(context, "Not deleted", Toast.LENGTH_SHORT).show()
             }
         }
 
         viewModel.imagesChanged.observe(viewLifecycleOwner) { imageChanged ->
             if (imageChanged) {
                 Toast.makeText(context, "Image added successfully!", Toast.LENGTH_SHORT).show()
-//                navigator.navigateToSelfProfile()
-            } else {
-//                Toast.makeText(context, "Image too big or server error", Toast.LENGTH_SHORT).show()
             }
         }
 

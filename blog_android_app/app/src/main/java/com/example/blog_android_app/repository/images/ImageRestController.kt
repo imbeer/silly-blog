@@ -44,4 +44,13 @@ object ImageRestController {
             .error(R.drawable.placeholder_error)
             .into(imageView)
     }
+
+    fun downloadImageByLink(imageView: ImageView, imageLink: String) {
+        val url = BASE_URL + "image/" + imageLink
+        Glide.with(imageView.context)
+            .load(url)
+            .placeholder(R.drawable.profile)
+            .error(R.drawable.profile)
+            .into(imageView)
+    }
 }
