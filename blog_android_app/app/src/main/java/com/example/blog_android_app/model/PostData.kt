@@ -8,8 +8,8 @@ data class PostData(
     @SerializedName("text_content") var textContent: String = "",
     @SerializedName("author") val username: String = "",
     var likes: Int = 0,
-    var isLiked: Boolean = false,
-    var canBeEdited: Boolean = false,
+    @SerializedName("is_liked") var isLiked: Boolean = false,
+    @SerializedName("can_be_edited") var canBeEdited: Boolean = false,
     var images: List<Int>? = null,
     val time: String? = null
 )

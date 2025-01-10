@@ -16,7 +16,8 @@ interface PostApiService {
     @GET("/posts")
     suspend fun getPosts(
         @Header("Authorization") token: String,
-        @Query("author") author: String,
+        @Query("sort") sort: String,
+        @Query("author") author: Int,
         @Query("prompt") prompt: String,
         @Query("offset") offset: Int,
         @Query("limit") limit: Int

@@ -8,6 +8,6 @@ data class CommentData(
     @SerializedName("user_id") val userId: Int? = null,
     @SerializedName("text_content") var textContent: String = "",
     @SerializedName("author") val username: String = "",
-    var canBeEdited: Boolean = false,
+    @SerializedName("can_be_edited") var canBeEdited: Boolean = false,
     val time: String? = null
 )
