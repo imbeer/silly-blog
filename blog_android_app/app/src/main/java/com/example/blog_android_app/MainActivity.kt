@@ -11,6 +11,7 @@ import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.view.edit.EditPostFragment
 import com.example.blog_android_app.view.feed.FeedFragment
 import com.example.blog_android_app.view.post.PostFragment
+import com.example.blog_android_app.view.profile.EditProfileFragment
 import com.example.blog_android_app.view.profile.LoginFragment
 import com.example.blog_android_app.view.profile.ProfileFragment
 import com.example.blog_android_app.view.search.SearchFragment
@@ -18,6 +19,7 @@ import com.example.blog_android_app.viewmodel.CommentListViewModel
 import com.example.blog_android_app.viewmodel.LoginViewModel
 import com.example.blog_android_app.viewmodel.PostEditViewModel
 import com.example.blog_android_app.viewmodel.PostListViewModel
+import com.example.blog_android_app.viewmodel.ProfileEditViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 
@@ -77,6 +79,12 @@ class MainActivity : AppCompatActivity() {
         fun navigateToPostEditFragment(postData: PostData) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, EditPostFragment(PostEditViewModel(postData), navigator))
+                .addToBackStack(null)
+                .commit()
+        }
+        fun navigateToProfileEditFragment() {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, EditProfileFragment(viewModel = ProfileEditViewModel(userData = UserRestController.user), navigator = navigator))
                 .addToBackStack(null)
                 .commit()
         }

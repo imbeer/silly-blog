@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="@color/crust"
+    android:orientation="vertical"
+    tools:context=".view.profile.EditProfileFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/edit_profile_control_panel"
+        android:orientation="horizontal">
+        <ImageButton
+         android:id="@+id/edit_profile_submit_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:background="@drawable/post_card_bg"
+            android:src="@drawable/check_active" />
+        <ImageButton
+            android:id="@+id/edit_profile_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:background="@drawable/post_card_bg"
+            android:src="@drawable/delete" />
+        <ImageButton
+            android:id="@+id/edit_profile_picture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:background="@drawable/post_card_bg"
+            android:src="@drawable/attach" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/edit_username_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/post_card_bg"
+        android:hint="Your name"
+        android:textColorHint="@color/surface"
+        android:layout_margin="16dp"
+        android:padding="16dp"
+        android:inputType="textMultiLine" />
+
+    <EditText
+        android:id="@+id/edit_bio_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/post_card_bg"
+        android:hint="About yourself"
+        android:textColorHint="@color/surface"
+        android:layout_margin="16dp"
+        android:padding="16dp"
+        android:inputType="textMultiLine" />
+
+</LinearLayout>

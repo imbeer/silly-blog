@@ -106,17 +106,20 @@ object UserRestController {
             Log.e("UPLOAD", "Error: ${e.message}")
             throw e
         }
+        getCurrentUser(user.userId!!)
     }
 
     suspend fun updateUser(userdata: UserData): Boolean {
         val resp = api.updateUser("Bearer $token",
             constructJson(userdata)
         )
+        getCurrentUser(user.userId!!)
         return resp.isSuccessful
     }
 
-    suspend fun deleteUser() {
+    suspend fun deleteUser(context: Context) {
         api.deleteUser("Bearer $token")
+        logout(context)
     }
 
     private fun constructJson(userdata: UserData): RequestBody = RequestBody.create(
