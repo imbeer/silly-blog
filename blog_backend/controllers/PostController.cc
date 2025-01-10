@@ -13,7 +13,7 @@ void PostController::get(
 
     const auto currentUser = jwtService::getCurrentUserFromRequest(req);
 
-    const auto successHandler = [callbackPtr](const drogon::orm::Result &r) {
+    const auto successHandler = [callbackPtr](const Result &r) {
         Json::Value postArray(Json::arrayValue);
         cout << r.affectedRows() << endl;
         for (const auto &row : r) {
@@ -113,25 +113,41 @@ void PostController::create(
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
     auto newPost = parseService::getPostFromRequest(*req);
     const auto userId = jwtService::getCurrentUserIdFromRequest(req);
+    const auto imageIds = parseService::getImageIdListStringFromRequest(*req);
 
     newPost.setUserId(userId.value());
     newPost.setTime(::trantor::Date::now());
 
-    m_postMapper.insert(
-        newPost,
-        [callbackPtr, req, this](const drogon_model::blog::Post &post) {
-            auto json = Json::Value();
-            json["post"] = post.toJson();
+    const auto successHandler = [callbackPtr](const Result &r) { httpService::sendEmptyResponse(callbackPtr, k201Created); };
+    const auto errorHandler = [callbackPtr](const DrogonDbException &e) { httpService::sendEmptyResponse(callbackPtr, k400BadRequest); };
 
-            // addPostImages(req, post.getValueOfPostId());
-
-            auto response = HttpResponse::newHttpJsonResponse(json);
-            response->setStatusCode(HttpStatusCode::k201Created);
-            (*callbackPtr)(response);
-        },
-        [callbackPtr](const drogon::orm::DrogonDbException &e) {
-            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-        });
+    if (imageIds.empty()) {
+        const string sql = R"(INSERT INTO post (user_id, text_content, time) VALUES ($1, $2, $3) RETURNING post_id)";
+        *m_dbClient
+            << sql
+            << to_string(newPost.getValueOfUserId())
+            << newPost.getValueOfTextContent()
+            << newPost.getValueOfTime().toDbString()
+            >> successHandler >> errorHandler;
+    } else {
+        const string sql = R"(
+            WITH new_post AS (
+                INSERT INTO post (user_id, text_content, time)
+                VALUES ($1, $2, $3)
+                RETURNING post_id, user_id, text_content, time
+            )
+            UPDATE image
+            SET post_id = (SELECT post_id FROM new_post)
+            WHERE image_id = ANY($4) AND post_id IS NULL AND EXISTS (SELECT 1 FROM image WHERE image_id = ANY($4) );
+            )";
+        *m_dbClient
+                << sql
+                << to_string(newPost.getValueOfUserId())
+                << newPost.getValueOfTextContent()
+                << newPost.getValueOfTime().toDbString()
+                << imageIds
+            >> successHandler >> errorHandler;
+    }
 }
 
 void PostController::update(

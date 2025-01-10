@@ -144,6 +144,7 @@ Authorisation: Bearer jwt
 "post":
 {
     "text_content": text,
+    "images:" [ints ] // ids
 }
 ```
 
