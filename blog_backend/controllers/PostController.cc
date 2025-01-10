@@ -6,16 +6,17 @@
 void PostController::get(
     const HttpRequestPtr &req,
     std::function<void (const HttpResponsePtr &)> &&callback,
-    const string sort, const string author, const string prompt,
-    const int offset, const int limit)
+    const string &prompt,
+    int sort, int author,
+    int offset, int limit)
 {
+    cout << sort << author << prompt << offset << limit << endl;
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));    
 
     const auto currentUser = jwtService::getCurrentUserFromRequest(req);
 
     const auto successHandler = [callbackPtr](const Result &r) {
         Json::Value postArray(Json::arrayValue);
-        cout << r.affectedRows() << endl;
         for (const auto &row : r) {
             Json::Value postJson;
             cout << row["post_id"].as<string>() << endl;
@@ -42,18 +43,6 @@ void PostController::get(
 
     const auto errorHandler = [callbackPtr](const DrogonDbException &e) { httpService::sendEmptyResponse(callbackPtr, k400BadRequest); };
 
-    int authorId = -1;
-    if (!author.empty()) {
-        try {
-            authorId = stoi(author);
-            if (authorId < 0) throw runtime_error("negative");
-        } catch (const exception &e) {
-            cout << "cant parse string" << endl;
-            cout << e.what() << endl;
-            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
-        }
-    }
-
     const string startSql = R"(
         SELECT
         p.post_id as "post_id",
@@ -63,7 +52,7 @@ void PostController::get(
         EXISTS (SELECT 1 FROM "like" l WHERE l.post_id = p.post_id AND l.user_id = $1) AS "is_liked",
         u.username AS author,
         (p.user_id = $1 OR u.is_admin = TRUE) AS "can_be_edited",
-        COALESCE(image_array.image_ids, ARRAY[]::integer[]) AS image_ids
+        COALESCE(image_array.image_ids, ARRAY[]::integer[]) AS "image_ids"
 
         FROM post p
         JOIN "user" u ON p.user_id = u.user_id
@@ -73,18 +62,18 @@ void PostController::get(
         WHERE p.text_content ILIKE '%' || $2 || '%' )";
 
     string orderSql = "";
-    if (sort == "t") { // order by time
-        orderSql = "ORDER BY p.time DESC";
-    } else if (sort == "l") { // order by likes
-        orderSql = "ORDER BY COALESCE(like_count.likes, 0) DESC";
+    if (sort == 1) { // order by time
+        orderSql = "ORDER BY p.time DESC ";
+    } else if (sort == 2) { // order by likes
+        orderSql = "ORDER BY likes DESC ";
     }
 
-    const string authorSql = author.empty() ? "" : "AND p.user_id = $3 ";
-    const string paginateSql = author.empty() ? "LIMIT $3 OFFSET $4;" : "LIMIT $4 OFFSET $5;";
+    const string authorSql = author < 0 ? "" : "AND p.user_id = $3 ";
+    const string paginateSql = author < 0 ? "LIMIT $3 OFFSET $4;" : "LIMIT $4 OFFSET $5;";
 
     cout << startSql + authorSql + orderSql + paginateSql << endl;
 
-    if (author.empty()) {
+    if (author < 0) {
         *m_dbClient
                 << startSql + orderSql + paginateSql
                 << currentUser->getValueOfUserId()
@@ -98,7 +87,7 @@ void PostController::get(
                 << startSql + authorSql + orderSql + paginateSql
                 << currentUser->getValueOfUserId()
                 << prompt
-                << to_string(authorId)
+                << to_string(author)
                 << to_string(limit)
                 << to_string(offset)
             >>  successHandler

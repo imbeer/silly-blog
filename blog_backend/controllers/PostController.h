@@ -14,7 +14,7 @@ using namespace drogon::orm;
 class PostController : public HttpController<PostController> {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(PostController::get, "/posts?sort={1}author={2}&prompt={3}&offset={4}&limit={5}", Get, "LoginFilter");
+        ADD_METHOD_TO(PostController::get, "/posts?prompt={1}&sort={2}&author={3}&offset={4}&limit={5}", Get, "LoginFilter");
         ADD_METHOD_TO(PostController::create, "/posts", drogon::Post, "LoginFilter");
         ADD_METHOD_TO(PostController::update, "/posts", drogon::Put, "PostRightFilter");
         ADD_METHOD_TO(PostController::remove, "/posts", drogon::Delete, "PostRightFilter");
@@ -23,7 +23,8 @@ public:
     void get(
         const HttpRequestPtr &req,
         std::function<void (const HttpResponsePtr &)> &&callback,
-        const string sort, const string author, const string prompt,
+        const string &prompt,
+        const int sort, const int author,
         const int offset, const int limit);
     void create(
         const HttpRequestPtr &req,

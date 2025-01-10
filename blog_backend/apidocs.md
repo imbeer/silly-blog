@@ -95,9 +95,9 @@ Resp: 204 if deleted, 401 if wrong jwt, 400 if already deleted or something wron
 
 #### Postdata:
 
-- GET: /posts?sort={text}&prompt={text}&offset={int}&limit={int}
+- GET: /posts?prompt={text}&sort={1 - time, 2 - likes}&author={int}&offset={int}&limit={int}
 
-All posts sorted (l = likes, t = time, empty -> no sort, id (same as time actually)) &&
+All posts sorted (2 = likes, 1 = time, empty -> no sort, id (same as time actually)) &&
 All posts with prompt text inside (can be empty -> no restrictions)
 
 requires:
