@@ -49,15 +49,10 @@ class PostFragment(
     ): View? {
         val view = inflater.inflate(R.layout.post_fragment, container, false)
         commentList = view.findViewById(R.id.comment_list)
-//        searchBar = view.findViewById(R.id.comment_search_bar)
-//        searchButton = view.findViewById(R.id.comment_search_button)
         editButton = view.findViewById(R.id.post_edit_button)
         clearButton = view.findViewById(R.id.post_clear_button)
         commentBar = view.findViewById(R.id.comment_bar)
         commentButton = view.findViewById(R.id.comment_submit_button)
-
-//        searchButton.visibility = View.GONE
-//        searchBar.visibility = View.GONE
 
         likeNumber = view.findViewById(R.id.like_number)
         likeButton = view.findViewById(R.id.like)
@@ -113,24 +108,10 @@ class PostFragment(
             }
         })
 
-//        searchBar.setOnFocusChangeListener { _, hasFocus ->
-//            if (hasFocus) {
-//                hideControlButtons()
-////                hideCommentPanel()
-//            } else {
-//                showControlButtons()
-////                showCommentPanel()
-//            }
-//        }
-
         clearButton.setOnClickListener {
             viewModel.deletePost()
             navigator.navigateToSelfProfile()
         }
-
-//        searchButton.setOnClickListener {
-//            viewModel.search(searchBar.text.toString())
-//        }
 
         commentButton.setOnClickListener {
             if (commentBar.text != null) {
@@ -176,14 +157,4 @@ class PostFragment(
             clearButton.visibility = View.VISIBLE
         }
     }
-//
-//    private fun hideCommentPanel() {
-//        commentButton.visibility = View.GONE
-//        commentBar.visibility = View.GONE
-//    }
-//
-//    private fun showCommentPanel() {
-//        commentButton.visibility = View.VISIBLE
-//        commentBar.visibility = View.VISIBLE
-//    }
 }

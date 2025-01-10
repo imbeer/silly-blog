@@ -1,6 +1,7 @@
 package com.example.blog_android_app.view.search
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -78,6 +79,7 @@ class SearchFragment(val navigator: MainActivity.Navigator) : Fragment() {
         }
 
         sortButton.setOnClickListener {
+            Log.d("change sort", "clicked")
             if (viewModel.getSort() == TIME_SORT) {
                 viewModel.setSort(LIKE_SORT)
                 sortButton.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.favorite_inactive))

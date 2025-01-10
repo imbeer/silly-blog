@@ -17,10 +17,6 @@ class CommentListViewModel(
 ) : ViewModel() {
     private var loading = false
     private var endOfFeed = false
-    fun isLoading():Boolean = loading
-    fun isEnded(): Boolean = endOfFeed
-    fun getUsername(): String = username
-    fun getPostData(): PostData = postData
 
     private val _currentComment = MutableLiveData<CommentData>()
     val currentComment: LiveData<CommentData> get() = _currentComment
@@ -46,6 +42,11 @@ class CommentListViewModel(
     private fun _notifyDataSetChanged() {
         _notifyDataSetChanged.value = true
     }
+
+    fun isLoading():Boolean = loading
+    fun isEnded(): Boolean = endOfFeed
+    fun getUsername(): String = username
+    fun getPostData(): PostData = postData
 
     private fun addComments(newComments: List<CommentData>) {
         val currentList = _comments.value ?: mutableListOf()
@@ -76,16 +77,14 @@ class CommentListViewModel(
     fun update() {
         _comments.value?.clear()
         endOfFeed = false
+        _notifyDataSetChanged()
         loadData()
         _notifyDataSetChanged()
     }
 
     fun search(author: String) {
         username = author
-        _comments.value?.clear()
-        endOfFeed = false
-        loadData()
-        _notifyDataSetChanged()
+        update()
     }
 
     fun sendComment(text: String) {
