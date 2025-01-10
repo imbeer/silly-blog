@@ -16,12 +16,13 @@ object PostRestController {
 
     suspend fun fetchPosts(
         token: String = UserRestController.token.toString(),
-        author: String = "",
+        sort: Int = 1,
+        author: Int = -1,
         prompt: String = "",
         offset: Int,
         limit: Int
     ): List<PostData>? {
-        return api.getPosts("Bearer $token", author, prompt, offset, limit).body()
+        return api.getPosts("Bearer $token", sort, author, prompt, offset, limit).body()
     }
 
     suspend fun createPost(

@@ -17,9 +17,10 @@ import com.example.blog_android_app.view.feed.PostFeedAdapter
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class ProfileFragment(
-    private val navigator: MainActivity.Navigator
+    private val navigator: MainActivity.Navigator,
+    private val viewModel: PostListViewModel = PostListViewModel(user = UserRestController.user)
 ) : Fragment() {
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var postList: RecyclerView
     private lateinit var adapter: PostFeedAdapter
     private lateinit var username: TextView
     private lateinit var bio: TextView
@@ -30,21 +31,23 @@ class ProfileFragment(
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.profile_fragment, container, false)
-        recyclerView = view.findViewById(R.id.profile_recycle_view)
+        postList = view.findViewById(R.id.profile_recycle_view)
         username = view.findViewById(R.id.profile_username)
         bio = view.findViewById(R.id.profile_bio)
         image = view.findViewById(R.id.profile_user_image)
 
-        val viewModel = PostListViewModel(username = UserRestController.user.username!!)
-
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        postList.layoutManager = LinearLayoutManager(context)
         adapter = PostFeedAdapter(viewModel, navigator, this.viewLifecycleOwner)
         viewModel.loadData()
-        recyclerView.adapter = adapter
-        username.text = UserRestController.user.username
-        bio.text = UserRestController.user.bio
+        postList.adapter = adapter
+        username.text = viewModel.user.username
+        bio.text = viewModel.user.bio
 
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        viewModel.notifyDataSetChanged.observe(viewLifecycleOwner) {
+            postList.scrollToPosition(0)
+        }
+
+        postList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 if (viewModel.isEnded() || viewModel.isLoading()) {

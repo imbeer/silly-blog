@@ -5,12 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.blog_android_app.DEFAULT_POSTS_LOAD_LIMIT
+import com.example.blog_android_app.TIME_SORT
 import com.example.blog_android_app.model.PostData
+import com.example.blog_android_app.model.UserData
 import com.example.blog_android_app.repository.posts.PostRestController
 import kotlinx.coroutines.runBlocking
 
 class PostListViewModel(
-    private val username: String = "",
+    val user: UserData = UserData(userId = -1),
     private val searchPrompt: String = "",
     private val loadLimit: Int = DEFAULT_POSTS_LOAD_LIMIT
 ) : ViewModel () {
@@ -19,11 +21,36 @@ class PostListViewModel(
     private var endOfFeed = false
     fun isLoading():Boolean = loading
     fun isEnded(): Boolean = endOfFeed
-    fun getUsername(): String = username
+    fun getUsername(): String? = user.username
     fun getPrompt(): String = searchPrompt
+
+    private var sort: Int = TIME_SORT
+    fun changeSort(type: Int = TIME_SORT) {
+        if (sort == type) {
+            return
+        }
+        sort = type
+        _posts.value!!.clear()
+        loadData()
+        notifyDataSetChanged
+    }
 
     private val _posts = MutableLiveData<MutableList<PostData>>()
     val posts: LiveData<MutableList<PostData>> get() = _posts
+
+    private val _notifyItemRangeInserted = MutableLiveData<Pair<Int, Int>>()
+    val notifyItemRangeInserted: LiveData<Pair<Int, Int>> get() = _notifyItemRangeInserted
+
+    private val _notifyDataSetChanged = MutableLiveData(false)
+    val notifyDataSetChanged: LiveData<Boolean> get() = _notifyDataSetChanged
+
+    private fun _notifyItemRangeInserted(startIndex: Int, count: Int) {
+        _notifyItemRangeInserted.value = Pair(startIndex, count)
+    }
+
+    private fun _notifyDataSetChanged() {
+        _notifyDataSetChanged.value = true
+    }
 
     init {
         _posts.value = mutableListOf()
@@ -37,19 +64,14 @@ class PostListViewModel(
         _notifyItemRangeInserted(startIndex, newPosts.size)
     }
 
-    private val _notifyItemRangeInserted = MutableLiveData<Pair<Int, Int>>()
-    val notifyItemRangeInserted: LiveData<Pair<Int, Int>> get() = _notifyItemRangeInserted
-
-    private fun _notifyItemRangeInserted(startIndex: Int, count: Int) {
-        _notifyItemRangeInserted.value = Pair(startIndex, count)
-    }
 
     fun loadData() {
         loading = true
 
         runBlocking {
             val newItems = PostRestController.fetchPosts(
-                author = username,
+                sort = sort,
+                author = user.userId!!,
                 offset = _posts.value?.size ?: 0,
                 limit = loadLimit)
             if (!newItems.isNullOrEmpty()) {

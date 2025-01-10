@@ -14,7 +14,7 @@ import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class FeedFragment(val navigator: MainActivity.Navigator) : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
+    private lateinit var postList: RecyclerView
     private lateinit var adapter: PostFeedAdapter
 
     override fun onCreateView(
@@ -22,15 +22,19 @@ class FeedFragment(val navigator: MainActivity.Navigator) : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.feed_fragment, container, false)
-        recyclerView = view.findViewById(R.id.post_recycler_view)
-        recyclerView.layoutManager = LinearLayoutManager(context)
+        postList = view.findViewById(R.id.post_recycler_view)
+        postList.layoutManager = LinearLayoutManager(context)
         val viewModel = PostListViewModel()
 
         adapter = PostFeedAdapter(viewModel, navigator, this.viewLifecycleOwner)
         viewModel.loadData()
-        recyclerView.adapter = adapter
+        postList.adapter = adapter
 
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        viewModel.notifyDataSetChanged.observe(viewLifecycleOwner) {
+            postList.scrollToPosition(0)
+        }
+
+        postList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
