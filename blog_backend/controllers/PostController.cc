@@ -21,6 +21,7 @@ void PostController::get(
             Json::Value postJson;
             cout << row["post_id"].as<string>() << endl;
             postJson["post_id"] = row["post_id"].as<int>();
+            postJson["user_id"] = row["user_id"].as<int>();
             postJson["text_content"] = row["text_content"].as<string>();
             postJson["time"] = row["time"].as<string>();
             postJson["likes"] = row["likes"].as<int>();
@@ -48,6 +49,7 @@ void PostController::get(
         p.post_id as "post_id",
         p.text_content as "text_content",
         p.time as "time",
+        p.user_id AS "user_id"
         COALESCE(like_count.likes, 0) AS likes,
         EXISTS (SELECT 1 FROM "like" l WHERE l.post_id = p.post_id AND l.user_id = $1) AS "is_liked",
         u.username AS author,
