@@ -1,4 +1,4 @@
-package com.example.blog_android_app.view.feed
+package com.example.blog_android_app.view.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

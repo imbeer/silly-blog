@@ -13,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 
 class PostListViewModel(
     val user: UserData = UserData(userId = -1),
-    private val searchPrompt: String = "",
+    private var searchPrompt: String = "",
     private val loadLimit: Int = DEFAULT_POSTS_LOAD_LIMIT
 ) : ViewModel () {
 
@@ -23,9 +23,16 @@ class PostListViewModel(
     fun isEnded(): Boolean = endOfFeed
     fun getUsername(): String? = user.username
     fun getPrompt(): String = searchPrompt
+    fun setPrompt(prompt: String = "") {
+        searchPrompt = prompt
+        _posts.value!!.clear()
+        loadData()
+        notifyDataSetChanged
+    }
 
     private var sort: Int = TIME_SORT
-    fun changeSort(type: Int = TIME_SORT) {
+    fun getSort() = sort
+    fun setSort(type: Int = TIME_SORT) {
         if (sort == type) {
             return
         }
@@ -71,6 +78,7 @@ class PostListViewModel(
         runBlocking {
             val newItems = PostRestController.fetchPosts(
                 sort = sort,
+                prompt = searchPrompt,
                 author = user.userId!!,
                 offset = _posts.value?.size ?: 0,
                 limit = loadLimit)

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
+import com.example.blog_android_app.view.list.PostFeedAdapter
 import com.example.blog_android_app.viewmodel.PostListViewModel
 
 class FeedFragment(val navigator: MainActivity.Navigator) : Fragment() {

@@ -5,6 +5,10 @@
         android:icon="@drawable/home"
         android:title="Feed" />
     <item
+        android:id="@+id/nav_search"
+        android:icon="@drawable/search"
+        android:title="Search" />
+    <item
         android:id="@+id/nav_add_post"
         android:icon="@drawable/add_circle"
         android:title="Post" />

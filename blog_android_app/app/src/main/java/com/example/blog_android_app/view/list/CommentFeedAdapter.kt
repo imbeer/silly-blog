@@ -1,4 +1,4 @@
-package com.example.blog_android_app.view.post
+package com.example.blog_android_app.view.list
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater

@@ -13,6 +13,7 @@ import com.example.blog_android_app.view.feed.FeedFragment
 import com.example.blog_android_app.view.post.PostFragment
 import com.example.blog_android_app.view.profile.LoginFragment
 import com.example.blog_android_app.view.profile.ProfileFragment
+import com.example.blog_android_app.view.search.SearchFragment
 import com.example.blog_android_app.viewmodel.CommentListViewModel
 import com.example.blog_android_app.viewmodel.LoginViewModel
 import com.example.blog_android_app.viewmodel.PostEditViewModel
@@ -41,6 +42,10 @@ class MainActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     loadFragment(FeedFragment(navigator))
+                    true
+                }
+                R.id.nav_search -> {
+                    loadFragment(SearchFragment(navigator))
                     true
                 }
                 R.id.nav_add_post -> {
