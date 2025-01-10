@@ -33,7 +33,7 @@ void PostController::get(
             for (const auto &imageId : imageIdsArray) {
                 imageIds.append(*imageId);
             }
-            postJson["image_ids"] = imageIds;
+            postJson["images"] = imageIds;
             postArray.append(postJson);
         }
         auto response = HttpResponse::newHttpJsonResponse(postArray);
