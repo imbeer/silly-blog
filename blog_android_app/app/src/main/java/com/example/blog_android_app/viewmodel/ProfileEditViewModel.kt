@@ -66,7 +66,7 @@ class ProfileEditViewModel(
         }
     }
 
-    fun submit(bioText: String, usernameText: String, context: Context, lifecycleScope: LifecycleCoroutineScope) {
+    fun submit(bioText: String, usernameText: String, password: String, context: Context, lifecycleScope: LifecycleCoroutineScope) {
         userData.username = usernameText
         userData.bio = bioText
         _isLoading.value = true
