@@ -10,7 +10,7 @@ void PostController::get(
     int sort, int author,
     int offset, int limit)
 {
-    cout << sort << author << prompt << offset << limit << endl;
+    // cout << sort << author << prompt << offset << limit << endl;
     auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));    
 
     const auto currentUser = jwtService::getCurrentUserFromRequest(req);
@@ -19,7 +19,7 @@ void PostController::get(
         Json::Value postArray(Json::arrayValue);
         for (const auto &row : r) {
             Json::Value postJson;
-            cout << row["post_id"].as<string>() << endl;
+            // cout << row["post_id"].as<string>() << endl;
             postJson["post_id"] = row["post_id"].as<int>();
             postJson["user_id"] = row["user_id"].as<int>();
             postJson["text_content"] = row["text_content"].as<string>();
@@ -49,7 +49,7 @@ void PostController::get(
         p.post_id as "post_id",
         p.text_content as "text_content",
         p.time as "time",
-        p.user_id AS "user_id"
+        p.user_id AS "user_id",
         COALESCE(like_count.likes, 0) AS likes,
         EXISTS (SELECT 1 FROM "like" l WHERE l.post_id = p.post_id AND l.user_id = $1) AS "is_liked",
         u.username AS author,
@@ -73,7 +73,7 @@ void PostController::get(
     const string authorSql = author < 0 ? "" : "AND p.user_id = $3 ";
     const string paginateSql = author < 0 ? "LIMIT $3 OFFSET $4;" : "LIMIT $4 OFFSET $5;";
 
-    cout << startSql + authorSql + orderSql + paginateSql << endl;
+    // cout << startSql + authorSql + orderSql + paginateSql << endl;
 
     if (author < 0) {
         *m_dbClient
