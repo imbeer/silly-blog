@@ -1,12 +1,14 @@
 package com.example.blog_android_app.view.post
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,8 +17,10 @@ import com.example.blog_android_app.DEFAULT_POSTS_WHEN_TO_LOAD
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
 import com.example.blog_android_app.repository.likes.LikeRestController
+import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.view.feed.ImagePagerAdapter
 import com.example.blog_android_app.viewmodel.CommentListViewModel
+import kotlinx.coroutines.runBlocking
 
 class PostFragment(
     private val viewModel: CommentListViewModel,
@@ -141,6 +145,19 @@ class PostFragment(
 
         editButton.setOnClickListener {
             navigator.navigateToPostEditFragment(viewModel.getPostData())
+        }
+
+        postOwnerUsername.setOnClickListener {
+            val userId = viewModel.getPostData().userId
+            Log.d("NAVIGATE TO USER PROF", viewModel.getPostData().userId.toString())
+            runBlocking {
+                val user = UserRestController.getUser(userId!!)
+                if (user != null)
+                    navigator.navigateToUserProfile(user)
+                else {
+                    Toast.makeText(context, "User is gone", Toast.LENGTH_SHORT).show()
+                }
+            }
         }
 
         return view

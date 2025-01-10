@@ -84,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         fun navigateToUserProfile(user: UserData) {
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fragment_container, ProfileFragment(navigator = navigator, viewModel = PostListViewModel(user = user)))
+                .addToBackStack(null)
                 .commit()
         }
 
