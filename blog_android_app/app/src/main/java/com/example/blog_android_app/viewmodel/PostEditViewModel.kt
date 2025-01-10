@@ -89,11 +89,7 @@ class PostEditViewModel(private var postData: PostData) {
                 if (postData.postId != null) {
                     PostRestController.editPost(post = postData)
                 } else {
-                    val createdPost = PostRestController.createPost(post = postData)
-                    if (createdPost != null && images.isNotEmpty()) {
-                        createdPost.images = images
-                        PostRestController.editPost(post = createdPost)
-                    }
+                    PostRestController.createPost(post = postData)
                 }
             } catch (e: Exception) {
                 Log.d("TempTagPostSubmit", e.toString())
