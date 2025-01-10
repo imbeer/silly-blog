@@ -6,71 +6,104 @@
 void PostController::get(
     const HttpRequestPtr &req,
     std::function<void (const HttpResponsePtr &)> &&callback,
-    const string &author, const string &prompt,
+    const string sort, const string author, const string prompt,
     const int offset, const int limit)
 {
-    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));
-    Json::Value responseBody;
-    Criteria ownerCriteria;
-    Criteria promptCriteria = Criteria(
-        drogon_model::blog::Post::Cols::_text_content,
-        CompareOperator::Like,
-        "%" + prompt + "%");;
-
-    if (!author.empty()) {
-        const auto users = m_userMapper.findBy(Criteria(
-            drogon_model::blog::User::Cols::_username,
-            CompareOperator::EQ,
-            author));
-        if (users.empty()) {
-            httpService::sendEmptyResponse(callbackPtr, k200OK);
-            return;
-        }
-        const auto userId = users[0].getValueOfUserId();
-        ownerCriteria = Criteria(
-            drogon_model::blog::Post::Cols::_user_id,
-            CompareOperator::EQ,
-            userId);
-    }
-
-    const auto posts = m_postMapper
-                           .limit(limit)
-                           .offset(offset)
-                           .orderBy(drogon_model::blog::Post::Cols::_time, SortOrder::DESC)
-                           .findBy(promptCriteria && ownerCriteria);
+    auto callbackPtr = make_shared<function<void(const HttpResponsePtr &)>>(std::move(callback));    
 
     const auto currentUser = jwtService::getCurrentUserFromRequest(req);
-    const auto likeUserCriteria = Criteria(
-        drogon_model::blog::Like::Cols::_user_id,
-        CompareOperator::EQ,
-        currentUser->getValueOfUserId());
 
-    try {
-        for (const auto &post : posts)
-        {
-            auto postJson = post.toJson();
-            const auto likePostCriteria = Criteria(
-                drogon_model::blog::Like::Cols::_post_id,
-                CompareOperator::EQ,
-                post.getValueOfPostId());
+    const auto successHandler = [callbackPtr](const drogon::orm::Result &r) {
+        Json::Value postArray(Json::arrayValue);
+        cout << r.affectedRows() << endl;
+        for (const auto &row : r) {
+            Json::Value postJson;
+            cout << row["post_id"].as<string>() << endl;
+            postJson["post_id"] = row["post_id"].as<int>();
+            postJson["text_content"] = row["text_content"].as<string>();
+            postJson["time"] = row["time"].as<string>();
+            postJson["likes"] = row["likes"].as<int>();
+            postJson["is_liked"] = row["is_liked"].as<bool>();
+            postJson["author"] = row["author"].as<string>();
+            postJson["can_be_edited"] = row["can_be_edited"].as<bool>();
 
-            const int likes = m_likeMapper.count(likePostCriteria);
-            const bool isLiked = m_likeMapper.count(likePostCriteria && likeUserCriteria) == 1;
-
-            postJson["likes"] = likes;
-            postJson["isLiked"] = isLiked;
-            postJson["images"] = getImageIdsForPostId(post.getValueOfPostId());
-            postJson["author"] = getPostOwnerName(post.getValueOfUserId());
-            postJson["canBeEdited"] = (currentUser->getValueOfIsAdmin() ||
-                                       currentUser->getValueOfUserId() == post.getValueOfUserId());
-            responseBody.append(postJson);
+            Json::Value imageIds;
+            const auto imageIdsArray = row["image_ids"].asArray<int>();
+            for (const auto &imageId : imageIdsArray) {
+                imageIds.append(*imageId);
+            }
+            postJson["image_ids"] = imageIds;
+            postArray.append(postJson);
         }
-    } catch (const exception &e) {
-        httpService::sendEmptyResponse(callbackPtr, k500InternalServerError);
+        auto response = HttpResponse::newHttpJsonResponse(postArray);
+        response->setStatusCode(drogon::k200OK);
+        (*callbackPtr)(response);
+    };
+
+    const auto errorHandler = [callbackPtr](const DrogonDbException &e) { httpService::sendEmptyResponse(callbackPtr, k400BadRequest); };
+
+    int authorId = -1;
+    if (!author.empty()) {
+        try {
+            authorId = stoi(author);
+            if (authorId < 0) throw runtime_error("negative");
+        } catch (const exception &e) {
+            cout << "cant parse string" << endl;
+            cout << e.what() << endl;
+            httpService::sendEmptyResponse(callbackPtr, k400BadRequest);
+        }
     }
-    auto response = HttpResponse::newHttpJsonResponse(responseBody);
-    response->setStatusCode(HttpStatusCode::k200OK);
-    (*callbackPtr)(response);
+
+    const string startSql = R"(
+        SELECT
+        p.post_id as "post_id",
+        p.text_content as "text_content",
+        p.time as "time",
+        COALESCE(like_count.likes, 0) AS likes,
+        EXISTS (SELECT 1 FROM "like" l WHERE l.post_id = p.post_id AND l.user_id = $1) AS "is_liked",
+        u.username AS author,
+        (p.user_id = $1 OR u.is_admin = TRUE) AS "can_be_edited",
+        COALESCE(image_array.image_ids, ARRAY[]::integer[]) AS image_ids
+
+        FROM post p
+        JOIN "user" u ON p.user_id = u.user_id
+        LEFT JOIN (SELECT post_id, COUNT(*) AS likes FROM "like" GROUP BY post_id) like_count ON p.post_id = like_count.post_id
+        LEFT JOIN (SELECT post_id, ARRAY_AGG(image_id) AS image_ids FROM image GROUP BY post_id) image_array ON p.post_id = image_array.post_id
+
+        WHERE p.text_content ILIKE '%' || $2 || '%' )";
+
+    string orderSql = "";
+    if (sort == "t") { // order by time
+        orderSql = "ORDER BY p.time DESC";
+    } else if (sort == "l") { // order by likes
+        orderSql = "ORDER BY COALESCE(like_count.likes, 0) DESC";
+    }
+
+    const string authorSql = author.empty() ? "" : "AND p.user_id = $3 ";
+    const string paginateSql = author.empty() ? "LIMIT $3 OFFSET $4;" : "LIMIT $4 OFFSET $5;";
+
+    cout << startSql + authorSql + orderSql + paginateSql << endl;
+
+    if (author.empty()) {
+        *m_dbClient
+                << startSql + orderSql + paginateSql
+                << currentUser->getValueOfUserId()
+                << prompt
+                << to_string(limit)
+                << to_string(offset)
+            >>  successHandler
+            >>  errorHandler;
+    } else {
+        *m_dbClient
+                << startSql + authorSql + orderSql + paginateSql
+                << currentUser->getValueOfUserId()
+                << prompt
+                << to_string(authorId)
+                << to_string(limit)
+                << to_string(offset)
+            >>  successHandler
+            >>  errorHandler;
+    }
 }
 
 void PostController::create(

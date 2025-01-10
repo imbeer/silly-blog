@@ -46,7 +46,7 @@ void CommentController::get(
 
     for (const auto &comment : comments) {
         auto commentJson = comment.toJson();
-        commentJson["canBeEdited"] = (currentUser->getValueOfIsAdmin() ||
+        commentJson["can_be_edited"] = (currentUser->getValueOfIsAdmin() ||
                                       currentUser->getValueOfUserId() == comment.getValueOfUserId());
         commentJson["author"] = getCommentOwnerName(comment.getValueOfUserId());
         responseBody.append(commentJson);

@@ -95,9 +95,9 @@ Resp: 204 if deleted, 401 if wrong jwt, 400 if already deleted or something wron
 
 #### Postdata:
 
-- GET: /posts?author={text}&prompt={text}&offset={int}&limit={int}
+- GET: /posts?sort={text}&prompt={text}&offset={int}&limit={int}
 
-All posts of author (can be empty -> all authors) &&
+All posts sorted (l = likes, t = time, empty -> no sort, id (same as time actually)) &&
 All posts with prompt text inside (can be empty -> no restrictions)
 
 requires:
@@ -115,12 +115,12 @@ returns:
         "author": text (username),
         "text_content": text,
         "likes": int,
-        "isLiked": bool,
+        "is_liked": bool,
         "images": [int, int, int (image ids)]
         "time": timestamp
-        "canBeEdited" bool
+        "can_be_edited" bool
     },
-... sorted by time
+    ...
 ]
 ```
 
@@ -206,7 +206,7 @@ returns:
         "author": string (username),
         "text_content": int
         "time": timestamp   
-        "canBeEdited": bool
+        "can_be_edited": bool
     }
 ]
 ```
