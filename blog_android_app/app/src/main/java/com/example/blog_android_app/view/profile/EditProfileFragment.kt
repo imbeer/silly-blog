@@ -15,6 +15,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.blog_android_app.MainActivity
 import com.example.blog_android_app.R
+import com.example.blog_android_app.repository.users.UserRestController
 import com.example.blog_android_app.viewmodel.ProfileEditViewModel
 
 class EditProfileFragment(
@@ -70,7 +71,8 @@ class EditProfileFragment(
         }
 
         deleteButton.setOnClickListener {
-            viewModel.delete(requireContext(), lifecycleScope)
+//            viewModel.delete(requireContext(), lifecycleScope)
+            UserRestController.logout(requireContext())
             navigator.navigateToLoginFragment()
         }
 

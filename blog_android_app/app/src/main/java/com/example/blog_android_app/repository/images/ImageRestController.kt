@@ -45,7 +45,7 @@ object ImageRestController {
             .into(imageView)
     }
 
-    fun downloadImageByLink(imageView: ImageView, imageLink: String) {
+    fun downloadImageByLink(imageView: ImageView, imageLink: String?) {
         val url = BASE_URL + "image/" + imageLink
         Glide.with(imageView.context)
             .load(url)
