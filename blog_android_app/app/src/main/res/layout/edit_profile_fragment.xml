@@ -23,14 +23,6 @@
             android:background="@drawable/post_card_bg"
             android:src="@drawable/check_active" />
         <ImageButton
-            android:id="@+id/edit_profile_delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:padding="16dp"
-            android:background="@drawable/post_card_bg"
-            android:src="@drawable/delete" />
-        <ImageButton
             android:id="@+id/edit_profile_picture_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,6 +30,14 @@
             android:padding="16dp"
             android:background="@drawable/post_card_bg"
             android:src="@drawable/attach" />
+        <ImageButton
+            android:id="@+id/edit_profile_delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:padding="16dp"
+            android:background="@drawable/post_card_bg"
+            android:src="@drawable/logout" />
     </LinearLayout>
 
     <EditText
