@@ -53,11 +53,12 @@ void PostController::get(
         COALESCE(like_count.likes, 0) AS likes,
         EXISTS (SELECT 1 FROM "like" l WHERE l.post_id = p.post_id AND l.user_id = $1) AS "is_liked",
         u.username AS author,
-        (p.user_id = $1 OR u.is_admin = TRUE) AS "can_be_edited",
+        (p.user_id = $1 OR selfuser.is_admin = true) AS "can_be_edited",
         COALESCE(image_array.image_ids, ARRAY[]::integer[]) AS "image_ids"
 
         FROM post p
         JOIN "user" u ON p.user_id = u.user_id
+        JOIN "user" selfuser ON selfuser.user_id = $1
         LEFT JOIN (SELECT post_id, COUNT(*) AS likes FROM "like" GROUP BY post_id) like_count ON p.post_id = like_count.post_id
         LEFT JOIN (SELECT post_id, ARRAY_AGG(image_id) AS image_ids FROM image GROUP BY post_id) image_array ON p.post_id = image_array.post_id
 
