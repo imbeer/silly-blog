@@ -38,6 +38,7 @@ void UserController::search(
             userJson["username"] = user.getValueOfUsername();
             userJson["user_id"] = user.getValueOfUserId();
             userJson["image_link"] = user.getValueOfImageLink();
+            userJson["bio"] = user.getValueOfBio();
             userJson["is_admin"] = user.getValueOfIsAdmin() ? 1 : 0;
             responseBody.append(userJson);
         }
@@ -62,6 +63,7 @@ void UserController::get(
         userJson["username"] = user.getValueOfUsername();
         userJson["user_id"] = user.getValueOfUserId();
         userJson["image_link"] = user.getValueOfImageLink();
+        userJson["bio"] = user.getValueOfBio();
         auto response = HttpResponse::newHttpJsonResponse(userJson);
         response->setStatusCode(HttpStatusCode::k200OK);
         (*callbackPtr)(response);
